@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load seo_filters %}
 {% block title %}{% if product.meta_title %}{{ product.meta_title }}{% else %}{% if product.brand %}{{ product.brand }} — {% endif %}{{ product.title }} — ShopToolnix{% endif %}{% endblock %}
 {% block meta_desc %}{% if product.meta_description %}{{ product.meta_description }}{% elif product.short_description %}{{ product.short_description }}{% else %}{{ product.description|truncatechars:160 }}{% endif %}{% endblock %}
 {% block extra_head %}
@@ -198,19 +199,19 @@
     {% endif %}
 
     <!-- PRODUCT DETAILS & SPECS -->
-    <div style="margin-top:72px; padding-top:40px; border-top:1px solid var(--border);">
+    <article style="margin-top:72px; padding-top:40px; border-top:1px solid var(--border);">
       <style>
         .details-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 60px; align-items: start; }
         @media (max-width: 768px) { .details-grid { grid-template-columns: 1fr; gap: 40px; } }
       </style>
       <div class="details-grid">
-        <div>
+        <section>
           <h2 class="section-title">Product <em>Description</em></h2>
-          <div style="color:var(--ink); line-height:1.8; font-size:16px;">
-            {{ product.description|linebreaks }}
+          <div style="color:var(--ink); font-size:16px;">
+            {{ product.description|seo_description }}
           </div>
-        </div>
-        <div>
+        </section>
+        <section>
           <h2 class="section-title">Technical <em>Specs</em></h2>
           {% if product.specifications.all %}
           <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
@@ -224,9 +225,9 @@
           {% else %}
           <p style="color:var(--muted); font-size:14px;">No specifications available.</p>
           {% endif %}
-        </div>
+        </section>
       </div>
-    </div>
+    </article>
 
     <!-- PRODUCT TAGS -->
     {% if product.tags.all %}
