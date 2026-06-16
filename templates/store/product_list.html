@@ -49,11 +49,35 @@
     overflow: hidden;
     transition: max-height 0.3s ease;
   }
+  .product-page-layout {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .filter-sidebar {
+    position: sticky;
+    top: 80px;
+  }
+  @media (max-width: 768px) {
+    .product-page-layout {
+      grid-template-columns: 1fr;
+    }
+    .filter-sidebar {
+      position: static;
+      margin-bottom: 24px;
+    }
+    .filter-header { cursor: pointer; }
+    .filter-toggle-icon { display: block !important; }
+    .filter-body.collapsed { display: none; }
+    .product-page-header { padding: 16px 0 !important; }
+    .product-page-title { font-size: 24px !important; margin-bottom: 4px !important; }
+  }
 </style>
 
-<div style="background:var(--cream); border-bottom:1px solid var(--border); padding:28px 0;">
+<div class="product-page-header" style="background:var(--cream); border-bottom:1px solid var(--border); padding:28px 0;">
   <div class="container">
-    <h1 style="font-family:var(--font-display); font-size:32px; font-weight:800; margin-bottom:6px;">
+    <h1 class="product-page-title" style="font-family:var(--font-display); font-size:32px; font-weight:800; margin-bottom:6px;">
       {% if current_category %}{{ current_category|title }} Products{% elif query %}Search: "{{ query }}"{% else %}All Products{% endif %}
     </h1>
     <p style="color:var(--muted); font-size:14px;">{{ products|length }} products found</p>
@@ -61,17 +85,18 @@
 </div>
 
 <section class="section" style="padding-top:28px;">
-  <div class="container" style="display:grid; grid-template-columns:210px 1fr; gap:24px; align-items:start;">
+  <div class="container product-page-layout">
 
     <!-- FILTERS SIDEBAR (LEFT) -->
-    <aside style="position:sticky; top:80px;">
+    <aside class="filter-sidebar">
       <div style="background:white; border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
 
-        <div style="padding:14px 16px; border-bottom:1px solid var(--border); background:var(--ink);">
+        <div class="filter-header" onclick="document.getElementById('filter-body').classList.toggle('collapsed')" style="padding:14px 16px; border-bottom:1px solid var(--border); background:var(--ink); display:flex; justify-content:space-between; align-items:center;">
           <h3 style="font-family:var(--font-display); font-size:13px; font-weight:700; color:white; margin:0; text-transform:uppercase; letter-spacing:1.2px;">Filter Products</h3>
+          <span class="filter-toggle-icon" style="display:none; color:white; font-size:12px;">▼</span>
         </div>
 
-        <div style="padding:16px 14px;">
+        <div id="filter-body" class="filter-body collapsed" style="padding:16px 14px;">
 
           <!-- CATEGORY -->
           <div style="margin-bottom:20px;">
