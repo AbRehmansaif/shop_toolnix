@@ -95,10 +95,12 @@ def product_detail(request, slug):
     if not related:
         related = Product.objects.filter(is_active=True).exclude(id=product.id)[:20]
     categories = Category.objects.filter(parent__isnull=True)
+    deals = Product.objects.filter(is_active=True, is_deal_of_day=True).exclude(id=product.id).order_by("-discount_percent")[:10]
     return render(request, "store/product_detail.html", {
         "product": product,
         "related": related,
         "categories": categories,
+        "deals": deals,
     })
 
 
@@ -112,10 +114,21 @@ def track_click(request, slug):
 
 
 def deals(request):
-    deals = Product.objects.filter(
-        is_active=True, discount_percent__isnull=False
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    deals_qs = Product.objects.filter(
+        is_active=True, is_deal_of_day=True
     ).order_by("-discount_percent")
-    return render(request, "store/deals.html", {"deals": deals})
+    
+    paginator = Paginator(deals_qs, 24)
+    page_number = request.GET.get("page")
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+
+    return render(request, "store/deals.html", {"deals": page_obj, "page_obj": page_obj, "paginator": paginator})
 
 
 def blog_list(request):
