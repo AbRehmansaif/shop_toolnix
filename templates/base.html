@@ -273,12 +273,15 @@
       text-transform: uppercase; letter-spacing: 0.8px;
       margin-bottom: 16px;
     }
-    .deal-title { font-family: var(--font-display); font-size: 32px; font-weight: 800; margin-bottom: 12px; }
-    .deal-price { font-family: var(--font-display); font-size: 48px; font-weight: 800; color: var(--accent); }
+    .deal-title { font-family: var(--font-display); font-size: 26px; font-weight: 800; margin-bottom: 12px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .deal-desc { font-size: 15px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 24px; color: rgba(255,255,255,0.7); }
+    .deal-price { font-family: var(--font-display); font-size: 42px; font-weight: 800; color: var(--accent); }
     .deal-was { font-size: 16px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .deal-btns { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+    .deal-btns .btn { flex: 1; min-width: 140px; white-space: nowrap; justify-content: center; text-align: center; }
     .deal-img { aspect-ratio: 1; background: rgba(255,255,255,0.05); border-radius: 16px;
       display: flex; align-items: center; justify-content: center; padding: 24px; }
-    .deal-img img { max-height: 280px; object-fit: contain; }
+    .deal-img img { max-height: 100%; max-width: 100%; object-fit: contain; }
 
     /* FOOTER */
     footer {
@@ -329,6 +332,9 @@
     }
     .nav-toggle:hover { color: var(--accent); }
     @media (max-width: 1024px) {
+      .hide-on-tablet { display: none !important; }
+      .brands-container { gap: 20px !important; }
+      .brands-container > div { font-size: 16px !important; }
       .nav-actions .btn-outline { display: none; }
       .nav-toggle { display: block; }
       .nav-inner { justify-content: space-between; gap: 16px; }
@@ -349,8 +355,6 @@
       .nav-menu.active { display: flex; }
       .nav-links { flex-direction: column; gap: 8px; }
       .nav-search { flex: none; width: 100%; }
-      .deal-banner { grid-template-columns: 1fr; }
-      .deal-img { display: none; }
       .footer-grid { grid-template-columns: repeat(3, 1fr); gap: 32px; }
       .footer-brand { grid-column: span 3; }
       .deal-price { font-size: 36px; }
@@ -360,6 +364,10 @@
     }
     @media (max-width: 768px) {
       .hide-on-mobile { display: none !important; }
+      .section { padding: 40px 0; }
+      .section-sm { padding: 32px 0; }
+      .deal-banner { grid-template-columns: 1fr; text-align: left; }
+      .deal-img { display: none; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
       .footer-brand { grid-column: span 2; }
     }
@@ -367,6 +375,9 @@
       .nav-inner { padding: 0 16px; gap: 8px; }
       .nav-logo { font-size: 17px; gap: 4px; }
       .cart-btn { width: 38px; height: 38px; font-size: 18px; }
+      .section-header { align-items: center; margin-bottom: 24px; gap: 8px; }
+      .section-title { font-size: 19px; line-height: 1.2; }
+      .section-link { font-size: 13px; white-space: nowrap; }
       .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
       footer { padding: 40px 0 24px; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
@@ -381,6 +392,13 @@
       .hero-btns .btn { padding: 10px 14px !important; font-size: 13px !important; flex: 1; justify-content: center; text-align: center; }
       .hero-stats > div > div:first-child { font-size: 22px !important; }
       .hero-stats > div > div:last-child { font-size: 11px !important; }
+      .deal-banner { padding: 24px !important; text-align: left; }
+      .deal-banner > div:first-child { display: flex; flex-direction: column; align-items: flex-start; }
+      .deal-title { font-size: 18px !important; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px !important; }
+      .deal-desc { font-size: 13px !important; line-height: 1.5 !important; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 20px !important; }
+      .deal-price { font-size: 28px !important; }
+      .deal-btns { flex-direction: column; width: 100%; gap: 12px !important; }
+      .deal-btns .btn { width: 100%; justify-content: center; padding: 12px !important; }
     }
   </style>
   {% block extra_css %}{% endblock %}

@@ -89,7 +89,7 @@
       }
     </style>
     <div style="position: relative;">
-      <button class="hide-on-mobile" onclick="document.getElementById('categorySlider').scrollBy({ left: -300, behavior: 'smooth' })" style="position: absolute; left: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&larr;</button>
+      <button class="hide-on-tablet" onclick="document.getElementById('categorySlider').scrollBy({ left: -300, behavior: 'smooth' })" style="position: absolute; left: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&larr;</button>
       
       <div id="categorySlider" style="display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth; scroll-snap-type: x mandatory; padding: 10px 4px 20px 4px;">
         {% for cat in categories %}
@@ -122,7 +122,7 @@
         {% endfor %}
       </div>
       
-      <button class="hide-on-mobile" onclick="document.getElementById('categorySlider').scrollBy({ left: 300, behavior: 'smooth' })" style="position: absolute; right: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&rarr;</button>
+      <button class="hide-on-tablet" onclick="document.getElementById('categorySlider').scrollBy({ left: 300, behavior: 'smooth' })" style="position: absolute; right: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&rarr;</button>
     </div>
   </div>
 </section>
@@ -135,14 +135,14 @@
       <div>
         <div class="deal-badge">⚡ Deal of the Day</div>
         <h2 class="deal-title">{{ deal_of_day.title }}</h2>
-        <p style="color:rgba(255,255,255,0.6); margin-bottom:24px; font-size:15px;">{{ deal_of_day.short_description }}</p>
+        <p class="deal-desc" style="color:rgba(255,255,255,0.6); margin-bottom:24px; font-size:15px; line-height: 1.6;">{{ deal_of_day.short_description }}</p>
         <div class="deal-price">${{ deal_of_day.display_price }}</div>
         {% if deal_of_day.original_price %}
         <div class="deal-was">Was ${{ deal_of_day.original_price }} — Save {{ deal_of_day.discount_percent }}%</div>
         {% endif %}
-        <div style="margin-top:28px; display:flex; gap:12px;">
-          <a href="{% url 'track_click' deal_of_day.slug %}" class="btn btn-primary" style="font-size:15px; padding:13px 28px;" target="_blank" rel="noopener noreferrer sponsored">Grab This Deal →</a>
-          <a href="{% url 'product_detail' deal_of_day.slug %}" class="btn" style="background:rgba(255,255,255,0.1); color:white; padding:13px 28px;">View Details</a>
+        <div class="deal-btns">
+          <a href="{% url 'track_click' deal_of_day.slug %}" class="btn btn-primary" target="_blank" rel="noopener noreferrer sponsored">Grab This Deal →</a>
+          <a href="{% url 'product_detail' deal_of_day.slug %}" class="btn" style="background:rgba(255,255,255,0.1); color:white;">View Details</a>
         </div>
       </div>
       <div class="deal-img">
@@ -213,7 +213,7 @@
 <section class="hide-on-mobile" style="background: var(--white); padding: 40px 0; border-bottom: 1px solid var(--border);">
   <div class="container">
     <p style="text-align:center; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:24px;">Featuring Premium Tech Brands</p>
-    <div style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap; max-width: 900px; margin: 0 auto;">
+    <div class="brands-container" style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap; max-width: 900px; margin: 0 auto;">
       <!-- Tech Gadgets / Power -->
       <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#00BFA5; letter-spacing: 1px;" title="Tech Gadgets">ANKER</div>
       <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#121212;" title="Tech Gadgets">AUKEY</div>
