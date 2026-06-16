@@ -53,24 +53,58 @@
     <style>
       #categorySlider::-webkit-scrollbar { display: none; }
       #categorySlider { -ms-overflow-style: none; scrollbar-width: none; }
+      .home-cat-card { flex: 0 0 calc(25% - 18px); min-width: 260px; scroll-snap-align: start; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+      .home-cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; text-decoration: none; }
+      .home-cat-icon { font-size: 36px; }
+      .home-cat-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--ink); margin: 0; }
+      .home-cat-sub-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
+      .home-cat-sub-link { color: var(--ink); text-decoration: none; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+      .home-cat-sub-icon { font-size: 16px; }
+      .home-cat-all-link { font-size: 14px; color: var(--accent); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+      
+      .trust-strip { padding: 32px 0; background: var(--cream); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+      .trust-container { display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; }
+      .trust-item { display: inline-flex; align-items: center; gap: 8px; background: var(--white); border: 1px solid var(--border); padding: 8px 16px; border-radius: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--ink); transition: transform 0.2s; cursor: default; }
+      .trust-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+      .trust-icon { font-size: 18px; }
+      
+      @media (max-width: 768px) {
+        .home-cat-card { min-width: 220px; padding: 16px; }
+      }
+      @media (max-width: 480px) {
+        .home-cat-card { min-width: 170px; padding: 16px; border-radius: 10px; }
+        .home-cat-header { gap: 8px; margin-bottom: 12px; }
+        .home-cat-icon { font-size: 28px; }
+        .home-cat-title { font-size: 16px; }
+        .home-cat-sub-list { gap: 8px; }
+        .home-cat-sub-link { font-size: 13px; }
+        .home-cat-sub-icon { font-size: 14px; }
+        .home-cat-all-link { font-size: 12px; }
+        
+        .trust-strip { padding: 24px 0; }
+        .trust-container { gap: 10px; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 8px; margin-bottom: -8px; scrollbar-width: none; -ms-overflow-style: none; }
+        .trust-container::-webkit-scrollbar { display: none; }
+        .trust-item { padding: 6px 14px; font-size: 13px; gap: 6px; flex-shrink: 0; }
+        .trust-icon { font-size: 16px; }
+      }
     </style>
     <div style="position: relative;">
-      <button onclick="document.getElementById('categorySlider').scrollBy({ left: -300, behavior: 'smooth' })" style="position: absolute; left: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&larr;</button>
+      <button class="hide-on-mobile" onclick="document.getElementById('categorySlider').scrollBy({ left: -300, behavior: 'smooth' })" style="position: absolute; left: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&larr;</button>
       
-      <div id="categorySlider" style="display: flex; gap: 24px; overflow-x: auto; scroll-behavior: smooth; scroll-snap-type: x mandatory; padding: 10px 4px 20px 4px;">
+      <div id="categorySlider" style="display: flex; gap: 16px; overflow-x: auto; scroll-behavior: smooth; scroll-snap-type: x mandatory; padding: 10px 4px 20px 4px;">
         {% for cat in categories %}
-        <div style="flex: 0 0 calc(25% - 18px); min-width: 260px; scroll-snap-align: start; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column;">
-          <a href="{% url 'product_list' %}?category={{ cat.slug }}" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; text-decoration: none;">
-            <div style="font-size: 36px;">{{ cat.icon }}</div>
-            <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--ink); margin: 0;">{{ cat.name }}</h3>
+        <div class="home-cat-card">
+          <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="home-cat-header">
+            <div class="home-cat-icon">{{ cat.icon }}</div>
+            <h3 class="home-cat-title">{{ cat.name }}</h3>
           </a>
           
           {% if cat.homepage_subcategories %}
-          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
+          <ul class="home-cat-sub-list">
             {% for sub in cat.homepage_subcategories %}
             <li>
-              <a href="{% url 'product_list' %}?category={{ sub.slug }}" style="color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">
-                <span style="font-size: 16px;">{{ sub.icon }}</span> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ sub.name }}</span>
+              <a href="{% url 'product_list' %}?category={{ sub.slug }}" class="home-cat-sub-link" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--ink)'">
+                <span class="home-cat-sub-icon">{{ sub.icon }}</span> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ sub.name }}</span>
               </a>
             </li>
             {% endfor %}
@@ -79,7 +113,7 @@
           
           {% if cat.subcategories.exists %}
           <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
-            <a href="{% url 'product_list' %}?category={{ cat.slug }}" style="font-size: 14px; color: var(--accent); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">Shop all in {{ cat.name }} <span style="font-size: 12px;">→</span></a>
+            <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="home-cat-all-link">Shop all in {{ cat.name }} <span style="font-size: 12px;">→</span></a>
           </div>
           {% endif %}
         </div>
@@ -88,7 +122,7 @@
         {% endfor %}
       </div>
       
-      <button onclick="document.getElementById('categorySlider').scrollBy({ left: 300, behavior: 'smooth' })" style="position: absolute; right: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&rarr;</button>
+      <button class="hide-on-mobile" onclick="document.getElementById('categorySlider').scrollBy({ left: 300, behavior: 'smooth' })" style="position: absolute; right: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&rarr;</button>
     </div>
   </div>
 </section>
@@ -155,28 +189,28 @@
 </section>
 
 <!-- TRUST STRIP -->
-<section style="background: var(--cream); padding: 40px 0;">
+<section class="trust-strip">
   <div class="container">
-    <p style="text-align:center; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:24px;">Why Shop With Us</p>
-    <div style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap;">
-      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
-        <span style="font-size:24px;">🚚</span> Free Global Shipping
+    <p style="text-align:center; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:16px;">Why Shop With Us</p>
+    <div class="trust-container">
+      <div class="trust-item">
+        <span class="trust-icon">🚚</span> Global Shipping
       </div>
-      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
-        <span style="font-size:24px;">🔒</span> Secure Checkout
+      <div class="trust-item">
+        <span class="trust-icon">🔒</span> Secure Checkout
       </div>
-      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
-        <span style="font-size:24px;">⭐️</span> 24/7 Support
+      <div class="trust-item">
+        <span class="trust-icon">⭐️</span> 24/7 Support
       </div>
-      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
-        <span style="font-size:24px;">🏆</span> Quality Verified
+      <div class="trust-item">
+        <span class="trust-icon">🏆</span> Quality Verified
       </div>
     </div>
   </div>
 </section>
 
 <!-- BRANDS STRIP -->
-<section style="background: var(--white); padding: 40px 0; border-bottom: 1px solid var(--border);">
+<section class="hide-on-mobile" style="background: var(--white); padding: 40px 0; border-bottom: 1px solid var(--border);">
   <div class="container">
     <p style="text-align:center; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:24px;">Featuring Premium Tech Brands</p>
     <div style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap; max-width: 900px; margin: 0 auto;">
