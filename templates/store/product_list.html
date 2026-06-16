@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}All Products — ShopToolnix{% endblock %}
+{% block content %}
+
+<style>
+  .filter-cat-row {
+    display: flex;
+    align-items: center;
+    border-radius: 7px;
+    overflow: hidden;
+    transition: background 0.15s;
+  }
+  .filter-cat-row:hover { background: rgba(0,0,0,0.03); }
+  .filter-cat-link {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 8px;
+    font-weight: 600;
+    flex: 1;
+    text-decoration: none;
+    color: var(--ink);
+    background: transparent;
+  }
+  .filter-cat-link.active { color: var(--accent); background: rgba(255,77,0,0.08); border-radius: 7px; }
+  .chevron-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--muted);
+    transition: background 0.15s, transform 0.25s;
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+  .chevron-btn:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+  .chevron-btn svg { display: block; transition: transform 0.25s ease; }
+  .chevron-btn.collapsed svg { transform: rotate(-90deg); }
+  .sub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+</style>
+
+<div style="background:var(--cream); border-bottom:1px solid var(--border); padding:28px 0;">
+  <div class="container">
+    <h1 style="font-family:var(--font-display); font-size:32px; font-weight:800; margin-bottom:6px;">
+      {% if current_category %}{{ current_category|title }} Products{% elif query %}Search: "{{ query }}"{% else %}All Products{% endif %}
+    </h1>
+    <p style="color:var(--muted); font-size:14px;">{{ products|length }} products found</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top:28px;">
+  <div class="container" style="display:grid; grid-template-columns:210px 1fr; gap:24px; align-items:start;">
+
+    <!-- FILTERS SIDEBAR (LEFT) -->
+    <aside style="position:sticky; top:80px;">
+      <div style="background:white; border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); background:var(--ink);">
+          <h3 style="font-family:var(--font-display); font-size:13px; font-weight:700; color:white; margin:0; text-transform:uppercase; letter-spacing:1.2px;">Filter Products</h3>
+        </div>
+
+        <div style="padding:16px 14px;">
+
+          <!-- CATEGORY -->
+          <div style="margin-bottom:20px;">
+            <p style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); margin-bottom:8px; padding:0 4px;">Category</p>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:1px;">
+              <li>
+                <a href="{% url 'product_list' %}" class="filter-cat-link {% if not current_category %}active{% endif %}" style="border-radius:7px; padding:6px 8px; font-size:13px;">
+                  All Categories
+                </a>
+              </li>
+              {% for cat in categories %}
+              <li>
+                <div class="filter-cat-row">
+                  <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="filter-cat-link {% if current_category == cat.slug %}active{% endif %}">
+                    <span>{{ cat.icon }}</span> {{ cat.name }}
+                  </a>
+                  {% if cat.subcategories.all %}
+                  <button class="chevron-btn {% if not current_category == cat.slug %}collapsed{% endif %}" 
+                          id="btn-{{ cat.slug }}" 
+                          onclick="toggleSub('sub-{{ cat.slug }}', this)"
+                          title="Toggle subcategories">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  {% endif %}
+                </div>
+              </li>
+              {% for sub in cat.subcategories.all %}
+              {% if forloop.first %}<ul id="sub-{{ cat.slug }}" class="sub-list" style="max-height:{% if current_category == sub.slug or current_category == cat.slug %}500px{% else %}0px{% endif %};">{% endif %}
+              <li style="margin-left:10px; padding-left:10px; border-left:2px solid var(--border);">
+                <a href="{% url 'product_list' %}?category={{ sub.slug }}" 
+                   style="font-size:12px; display:flex; align-items:center; gap:6px; padding:4px 8px; border-radius:6px; color:{% if current_category == sub.slug %}var(--accent){% else %}var(--muted){% endif %}; font-weight:{% if current_category == sub.slug %}600{% else %}400{% endif %}; background:{% if current_category == sub.slug %}rgba(255,77,0,0.08){% else %}transparent{% endif %}; text-decoration:none; transition:color 0.15s;">
+                  <span style="font-size:11px;">{{ sub.icon }}</span> {{ sub.name }}
+                </a>
+              </li>
+              {% if forloop.last %}</ul>{% endif %}
+              {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div style="height:1px; background:var(--border); margin-bottom:16px;"></div>
+
+          <!-- SORT BY -->
+          <div>
+            <p style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); margin-bottom:8px; padding:0 4px;">Sort By</p>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:1px;">
+              <li><a href="?sort=newest{% if current_category %}&category={{ current_category }}{% endif %}" style="font-size:13px; display:block; padding:6px 8px; border-radius:7px; color:{% if sort == 'newest' or not sort %}var(--accent){% else %}var(--text){% endif %}; font-weight:{% if sort == 'newest' or not sort %}600{% else %}400{% endif %}; text-decoration:none; background:{% if sort == 'newest' or not sort %}rgba(255,77,0,0.08){% else %}transparent{% endif %};">Newest First</a></li>
+              <li><a href="?sort=popular{% if current_category %}&category={{ current_category }}{% endif %}" style="font-size:13px; display:block; padding:6px 8px; border-radius:7px; color:{% if sort == 'popular' %}var(--accent){% else %}var(--text){% endif %}; font-weight:{% if sort == 'popular' %}600{% else %}400{% endif %}; text-decoration:none; background:{% if sort == 'popular' %}rgba(255,77,0,0.08){% else %}transparent{% endif %};">🔥 Most Popular</a></li>
+              <li><a href="?sort=price_low{% if current_category %}&category={{ current_category }}{% endif %}" style="font-size:13px; display:block; padding:6px 8px; border-radius:7px; color:{% if sort == 'price_low' %}var(--accent){% else %}var(--text){% endif %}; font-weight:{% if sort == 'price_low' %}600{% else %}400{% endif %}; text-decoration:none; background:{% if sort == 'price_low' %}rgba(255,77,0,0.08){% else %}transparent{% endif %};">Price: Low → High</a></li>
+              <li><a href="?sort=price_high{% if current_category %}&category={{ current_category }}{% endif %}" style="font-size:13px; display:block; padding:6px 8px; border-radius:7px; color:{% if sort == 'price_high' %}var(--accent){% else %}var(--text){% endif %}; font-weight:{% if sort == 'price_high' %}600{% else %}400{% endif %}; text-decoration:none; background:{% if sort == 'price_high' %}rgba(255,77,0,0.08){% else %}transparent{% endif %};">Price: High → Low</a></li>
+              <li><a href="?sort=rating{% if current_category %}&category={{ current_category }}{% endif %}" style="font-size:13px; display:block; padding:6px 8px; border-radius:7px; color:{% if sort == 'rating' %}var(--accent){% else %}var(--text){% endif %}; font-weight:{% if sort == 'rating' %}600{% else %}400{% endif %}; text-decoration:none; background:{% if sort == 'rating' %}rgba(255,77,0,0.08){% else %}transparent{% endif %};">⭐ Top Rated</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </aside>
+
+    <!-- PRODUCTS GRID -->
+    <div>
+      <div class="product-grid">
+        {% for product in products %}
+        {% include "store/_product_card.html" %}
+        {% empty %}
+        <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--muted);">
+          <div style="font-size:48px; margin-bottom:16px;">🔍</div>
+          <h3 style="font-family:var(--font-display); margin-bottom:8px;">No products found</h3>
+          <p>Try a different category or <a href="{% url 'product_list' %}" style="color:var(--accent);">view all products</a></p>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <!-- PAGINATION -->
+      {% if paginator.num_pages > 1 %}
+      <div style="margin-top: 48px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if current_platform %}&platform={{ current_platform }}{% endif %}{% if query %}&q={{ query }}{% endif %}" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s;">&larr; Prev</a>
+        {% else %}
+        <span style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--cream); color: var(--muted); font-weight: 600; font-size: 14px; cursor: not-allowed;">&larr; Prev</span>
+        {% endif %}
+
+        {% for i in paginator.page_range %}
+          {% if page_obj.number == i %}
+          <span style="padding: 10px 16px; border-radius: 8px; background: var(--accent); color: white; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(255,77,0,0.2);">{{ i }}</span>
+          {% elif i > page_obj.number|add:"-3" and i < page_obj.number|add:"3" %}
+          <a href="?page={{ i }}{% if current_category %}&category={{ current_category }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if current_platform %}&platform={{ current_platform }}{% endif %}{% if query %}&q={{ query }}{% endif %}" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s;" onmouseover="this.style.background='var(--cream)'" onmouseout="this.style.background='white'">{{ i }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}{% if current_platform %}&platform={{ current_platform }}{% endif %}{% if query %}&q={{ query }}{% endif %}" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; transition: background 0.2s;">Next &rarr;</a>
+        {% else %}
+        <span style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--cream); color: var(--muted); font-weight: 600; font-size: 14px; cursor: not-allowed;">Next &rarr;</span>
+        {% endif %}
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function toggleSub(id, btn) {
+    const ul = document.getElementById(id);
+    if (!ul) return;
+    const isOpen = ul.style.maxHeight !== '0px' && ul.style.maxHeight !== '';
+    if (isOpen) {
+      ul.style.maxHeight = '0px';
+      btn.classList.add('collapsed');
+    } else {
+      ul.style.maxHeight = ul.scrollHeight + 'px';
+      btn.classList.remove('collapsed');
+    }
+  }
+
+  // Set correct initial state on load
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[id^="sub-"]').forEach(function (ul) {
+      const catSlug = ul.id.replace('sub-', '');
+      const btn = document.getElementById('btn-' + catSlug);
+      if (!btn) return;
+      if (ul.style.maxHeight === '0px' || ul.style.maxHeight === '') {
+        btn.classList.add('collapsed');
+      } else {
+        btn.classList.remove('collapsed');
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Checkout — ShopToolnix{% endblock %}
+
+{% block content %}
+<style>
+  .checkout-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+  .checkout-title { font-size: 2rem; font-weight: 800; margin-bottom: 32px; }
+  .checkout-title span { color: var(--accent); }
+  .checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: 32px; }
+  @media(max-width:860px){ .checkout-grid { grid-template-columns: 1fr; } }
+
+  /* Form card */
+  .form-card { background: var(--white); border-radius: 16px; padding: 32px; box-shadow: var(--card-shadow); }
+  .form-section-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:600px){ .form-row { grid-template-columns: 1fr; } }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; font-size: 14px; font-family: inherit;
+    background: var(--paper); transition: border-color .2s, box-shadow .2s;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,77,0,.12);
+  }
+  .form-group .errorlist { list-style: none; color: #EF4444; font-size: 12px; margin-top: 4px; }
+
+  /* Payment options */
+  .payment-options { display: flex; flex-direction: column; gap: 12px; }
+  .payment-option { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: border-color .2s, background .2s; }
+  .payment-option:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .payment-option input[type="radio"] { accent-color: var(--accent); width: 18px; height: 18px; }
+  .payment-option-label { font-weight: 600; font-size: 15px; }
+
+  /* Submit */
+  .btn-place-order { display: block; width: 100%; padding: 18px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 17px; font-weight: 800; cursor: pointer; transition: transform .15s, box-shadow .15s; margin-top: 8px; }
+  .btn-place-order:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,77,0,.35); }
+
+  /* Order summary */
+  .summary-card { background: var(--white); border-radius: 16px; padding: 28px; box-shadow: var(--card-shadow); position: sticky; top: 90px; }
+  .summary-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+  .summary-items { margin-bottom: 20px; }
+  .summary-item { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .summary-item img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; background: var(--cream); flex-shrink: 0; }
+  .summary-item .item-name { font-size: 13px; font-weight: 600; line-height: 1.4; flex: 1; }
+  .summary-item .item-price { font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .summary-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+  .summary-row.total { font-weight: 800; font-size: 1.1rem; border-top: 2px solid var(--border); padding-top: 14px; margin-top: 6px; }
+  .summary-row.total span:last-child { color: var(--accent); }
+  .free-ship { color: #10B981; font-weight: 600; }
+  .secure-note { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 16px; }
+</style>
+
+<div class="checkout-wrap">
+  <h1 class="checkout-title">Secure <span>Checkout</span></h1>
+  <div class="checkout-grid">
+
+    <!-- Form -->
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-card" style="margin-bottom:24px;">
+        <div class="form-section-title">👤 Contact Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name *</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+          </div>
+          <div class="form-group">
+            <label>Last Name *</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address *</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+          <div class="form-group">
+            <label>Phone Number *</label>
+            {{ form.phone }}
+            {{ form.phone.errors }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:24px;">
+        <div class="form-section-title">📍 Shipping Address</div>
+        <div class="form-group">
+          <label>Country *</label>
+          {{ form.country }}
+          {{ form.country.errors }}
+        </div>
+        <div class="form-group">
+          <label>Address Line 1 *</label>
+          {{ form.address_line1 }}
+          {{ form.address_line1.errors }}
+        </div>
+        <div class="form-group">
+          <label>Address Line 2</label>
+          {{ form.address_line2 }}
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            {{ form.city }}
+            {{ form.city.errors }}
+          </div>
+          <div class="form-group">
+            <label>State / Province / Region *</label>
+            {{ form.state }}
+            {{ form.state.errors }}
+          </div>
+        </div>
+        <div class="form-group" style="width: 50%;">
+          <label>Postal / ZIP Code *</label>
+          {{ form.postal_code }}
+          {{ form.postal_code.errors }}
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:24px;">
+        <div class="form-section-title">💳 Payment Method</div>
+        <div class="payment-options">
+          {% for radio in form.payment_method %}
+          <label class="payment-option">
+            {{ radio.tag }}
+            <span class="payment-option-label">{{ radio.choice_label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-card" style="margin-bottom:24px;">
+        <div class="form-section-title">🚚 Delivery Instructions (Optional)</div>
+        <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Useful for apartments and office buildings.</p>
+        <div class="form-group">
+          <label>Delivery Notes</label>
+          {{ form.delivery_notes }}
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+            {{ form.leave_at_front_door }} Leave at front door
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+            {{ form.call_before_delivery }} Call before delivery
+          </label>
+        </div>
+        <div class="form-group">
+          <label>Gate code</label>
+          {{ form.gate_code }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn-place-order">🛒 Place Order</button>
+    </form>
+
+    <!-- Order Summary -->
+    <div class="summary-card">
+      <h3>Order Summary</h3>
+      <div class="summary-items">
+        {% for item in items %}
+        <div class="summary-item">
+          {% if item.product.image_url %}
+            <img src="{{ item.product.image_url }}" alt="{{ item.product.title }}">
+          {% else %}
+            <div style="width:52px;height:52px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🛍️</div>
+          {% endif %}
+          <div class="item-name">
+            {{ item.product.title|truncatechars:50 }}
+            <div style="color:var(--muted);font-size:12px;font-weight:400;">× {{ item.quantity }}</div>
+          </div>
+          <div class="item-price">${{ item.line_total }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <hr class="summary-divider">
+      <div class="summary-row"><span>Subtotal</span><span>${{ subtotal }}</span></div>
+      <div class="summary-row"><span>Shipping</span>
+        {% if shipping_fee > 0 %}
+          <span>${{ shipping_fee }}</span>
+        {% else %}
+          <span class="free-ship">FREE</span>
+        {% endif %}
+      </div>
+      <div class="summary-row total"><span>Total</span><span>${{ total }}</span></div>
+      <div class="secure-note">🔒 Your information is 100% secure & encrypted.</div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

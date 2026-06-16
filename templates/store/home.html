@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- HERO -->
+<section style="background: linear-gradient(135deg, #0D0D0D 0%, #1a1a1a 100%); color: white; padding: 80px 0; min-height: 100vh; display: flex; align-items: center;">
+  <div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+    <div>
+      <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,77,0,0.15); border:1px solid rgba(255,77,0,0.3); border-radius:20px; padding:6px 16px; font-size:13px; color:#FF4D00; font-weight:600; margin-bottom:24px;">
+        ✦ Premium Direct Products & Curated Deals
+      </div>
+      <h1 style="font-family:var(--font-body); font-size:52px; font-weight:800; line-height:1.1; letter-spacing:-1.5px; margin-bottom:20px;">
+        Trending Tech Gadgets.<br><span style="color:var(--accent)">Smart Home Gadgets</span><br>Unique Innovations.
+      </h1>
+      <p style="font-size:17px; color:rgba(255,255,255,0.65); line-height:1.7; margin-bottom:32px;">
+        Exclusive direct to consumer items and handpicked deals from top brands. Every product verified for quality and value.
+      </p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="{% url 'product_list' %}" class="btn btn-primary" style="font-size:15px; padding:13px 28px;">Browse Products →</a>
+        <a href="{% url 'deals' %}" class="btn" style="background:rgba(255,255,255,0.1); color:white; font-size:15px; padding:13px 28px;">🔥 Today's Deals</a>
+      </div>
+      <div style="display:flex; gap:32px; margin-top:40px;">
+        <div><div style="font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--accent);">{{ total_products }}+</div><div style="font-size:13px; color:rgba(255,255,255,0.5);">Products Listed</div></div>
+        <div><div style="font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--accent);">Global</div><div style="font-size:13px; color:rgba(255,255,255,0.5);">Fulfillment Partners</div></div>
+        <div><div style="font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--accent);">Daily</div><div style="font-size:13px; color:rgba(255,255,255,0.5);">Updated Deals</div></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:20px; justify-content:center; align-items:center;">
+      {% for product in featured|slice:":2" %}
+      <a href="{% url 'product_detail' product.slug %}" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:100%; max-width:450px; transition:all 0.2s; display:block;">
+        {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.title }}" style="width:100%; height:200px; object-fit:contain; margin-bottom:16px;">
+        {% else %}
+        <div style="height:200px; display:flex; align-items:center; justify-content:center; font-size:60px;">🛍️</div>
+        {% endif %}
+        <div style="font-size:18px; font-weight:600; color:var(--accent);">${{ product.display_price }}</div>
+        <div style="font-size:16px; color:rgba(255,255,255,0.9); margin-top:8px;">{{ product.title }}</div>
+      </a>
+      {% empty %}
+      <div style="color:rgba(255,255,255,0.4); text-align:center; padding:40px;">Add featured products via admin panel</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section-sm" style="background: var(--cream);">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Shop by <em>Category</em></h2>
+      <a href="{% url 'product_list' %}" class="section-link">All products →</a>
+    </div>
+    <style>
+      #categorySlider::-webkit-scrollbar { display: none; }
+      #categorySlider { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <div style="position: relative;">
+      <button onclick="document.getElementById('categorySlider').scrollBy({ left: -300, behavior: 'smooth' })" style="position: absolute; left: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&larr;</button>
+      
+      <div id="categorySlider" style="display: flex; gap: 24px; overflow-x: auto; scroll-behavior: smooth; scroll-snap-type: x mandatory; padding: 10px 4px 20px 4px;">
+        {% for cat in categories %}
+        <div style="flex: 0 0 calc(25% - 18px); min-width: 260px; scroll-snap-align: start; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column;">
+          <a href="{% url 'product_list' %}?category={{ cat.slug }}" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; text-decoration: none;">
+            <div style="font-size: 36px;">{{ cat.icon }}</div>
+            <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--ink); margin: 0;">{{ cat.name }}</h3>
+          </a>
+          
+          {% if cat.homepage_subcategories %}
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
+            {% for sub in cat.homepage_subcategories %}
+            <li>
+              <a href="{% url 'product_list' %}?category={{ sub.slug }}" style="color: var(--text); text-decoration: none; font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">
+                <span style="font-size: 16px;">{{ sub.icon }}</span> <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ sub.name }}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+          
+          {% if cat.subcategories.exists %}
+          <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+            <a href="{% url 'product_list' %}?category={{ cat.slug }}" style="font-size: 14px; color: var(--accent); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">Shop all in {{ cat.name }} <span style="font-size: 12px;">→</span></a>
+          </div>
+          {% endif %}
+        </div>
+        {% empty %}
+        <p style="color:var(--muted); padding-left: 20px;">Add categories from the admin panel.</p>
+        {% endfor %}
+      </div>
+      
+      <button onclick="document.getElementById('categorySlider').scrollBy({ left: 300, behavior: 'smooth' })" style="position: absolute; right: -80px; top: 120px; width: 44px; height: 44px; border-radius: 50%; background: var(--white); border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text);">&rarr;</button>
+    </div>
+  </div>
+</section>
+
+<!-- DEAL OF THE DAY -->
+{% if deal_of_day %}
+<section class="section">
+  <div class="container">
+    <div class="deal-banner">
+      <div>
+        <div class="deal-badge">⚡ Deal of the Day</div>
+        <h2 class="deal-title">{{ deal_of_day.title }}</h2>
+        <p style="color:rgba(255,255,255,0.6); margin-bottom:24px; font-size:15px;">{{ deal_of_day.short_description }}</p>
+        <div class="deal-price">${{ deal_of_day.display_price }}</div>
+        {% if deal_of_day.original_price %}
+        <div class="deal-was">Was ${{ deal_of_day.original_price }} — Save {{ deal_of_day.discount_percent }}%</div>
+        {% endif %}
+        <div style="margin-top:28px; display:flex; gap:12px;">
+          <a href="{% url 'track_click' deal_of_day.slug %}" class="btn btn-primary" style="font-size:15px; padding:13px 28px;" target="_blank" rel="noopener noreferrer sponsored">Grab This Deal →</a>
+          <a href="{% url 'product_detail' deal_of_day.slug %}" class="btn" style="background:rgba(255,255,255,0.1); color:white; padding:13px 28px;">View Details</a>
+        </div>
+      </div>
+      <div class="deal-img">
+        {% if deal_of_day.image_url %}
+        <img src="{{ deal_of_day.image_url }}" alt="{{ deal_of_day.title }}">
+        {% else %}
+        <div style="font-size:80px;">🛍️</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- FEATURED PRODUCTS -->
+<section class="section" id="featured">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title"><em>Featured</em> Products</h2>
+      <a href="{% url 'product_list' %}" class="section-link">See all →</a>
+    </div>
+    <div class="product-grid">
+      {% for product in featured %}
+      {% include "store/_product_card.html" %}
+      {% empty %}
+      <p style="color:var(--muted); grid-column:1/-1;">No featured products yet. Add some from the admin panel.</p>
+      {% endfor %}
+    </div>
+    
+    {% if featured.has_other_pages %}
+    <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:40px;">
+      {% if featured.has_previous %}
+      <a href="?page={{ featured.previous_page_number }}#featured" class="btn btn-outline" style="padding:8px 16px; font-size:14px;">&larr; Prev</a>
+      {% endif %}
+      <span style="font-size:14px; font-weight:600; color:var(--muted);">
+        Page {{ featured.number }} of {{ featured.paginator.num_pages }}
+      </span>
+      {% if featured.has_next %}
+      <a href="?page={{ featured.next_page_number }}#featured" class="btn btn-outline" style="padding:8px 16px; font-size:14px;">Next &rarr;</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<section style="background: var(--cream); padding: 40px 0;">
+  <div class="container">
+    <p style="text-align:center; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:24px;">Why Shop With Us</p>
+    <div style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap;">
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
+        <span style="font-size:24px;">🚚</span> Free Global Shipping
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
+        <span style="font-size:24px;">🔒</span> Secure Checkout
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
+        <span style="font-size:24px;">⭐️</span> 24/7 Support
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--ink);">
+        <span style="font-size:24px;">🏆</span> Quality Verified
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRANDS STRIP -->
+<section style="background: var(--white); padding: 40px 0; border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <p style="text-align:center; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; margin-bottom:24px;">Featuring Premium Tech Brands</p>
+    <div style="display:flex; justify-content:center; align-items:center; gap:40px; flex-wrap:wrap; max-width: 900px; margin: 0 auto;">
+      <!-- Tech Gadgets / Power -->
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#00BFA5; letter-spacing: 1px;" title="Tech Gadgets">ANKER</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#121212;" title="Tech Gadgets">AUKEY</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#00C16E; text-transform: uppercase;" title="PC/Tech Accessories">Ugreen</div>
+      <!-- Smart Home -->
+      <div style="font-family:var(--font-display); font-size:24px; font-weight:800; color:#FF6900;" title="Smart Home">mi</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#00A8E1;" title="Smart Home Cameras">Wyze</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#FF3B30;" title="Smart Home Automation">tuya</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#0079C1;" title="Smart Switches">SONOFF</div>
+      <!-- Car Accessories -->
+      <div style="font-family:var(--font-display); font-size:24px; font-weight:700; color:#000000; text-transform: lowercase;" title="Car Accessories">baseus</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#1E90FF;" title="Car Accessories">JOYROOM</div>
+      <!-- PC Parts / Gaming -->
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#E3000F;" title="PC Parts & Gaming">REDRAGON</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#00B8FC;" title="PC Peripherals">logitech</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#E8CC17;" title="PC Gaming">CORSAIR</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#44D62C;" title="PC Gaming">RAZER</div>
+      <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#222222; text-transform: uppercase;" title="Mechanical Keyboards">Keychron</div>
+    </div>
+  </div>
+</section>
+
+<!-- TRENDING -->
+<section class="section" id="trending">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">🔥 <em>Trending</em> Right Now</h2>
+      <a href="{% url 'product_list' %}?sort=popular" class="section-link">View all →</a>
+    </div>
+    <div class="product-grid">
+      {% for product in trending %}
+      {% include "store/_product_card.html" %}
+      {% empty %}
+      <p style="color:var(--muted); grid-column:1/-1;">Products will appear here as they get clicks.</p>
+      {% endfor %}
+    </div>
+    
+    {% if trending.has_other_pages %}
+    <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:40px;">
+      {% if trending.has_previous %}
+      <a href="?trending_page={{ trending.previous_page_number }}#trending" class="btn btn-outline" style="padding:8px 16px; font-size:14px;">&larr; Prev</a>
+      {% endif %}
+      <span style="font-size:14px; font-weight:600; color:var(--muted);">
+        Page {{ trending.number }} of {{ trending.paginator.num_pages }}
+      </span>
+      {% if trending.has_next %}
+      <a href="?trending_page={{ trending.next_page_number }}#trending" class="btn btn-outline" style="padding:8px 16px; font-size:14px;">Next &rarr;</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- BLOG -->
+{% if recent_blogs %}
+<section class="section" style="background:var(--cream);">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">From the <em>Blog</em></h2>
+      <a href="{% url 'blog_list' %}" class="section-link">All articles →</a>
+    </div>
+    <div class="blog-grid">
+      {% for post in recent_blogs %}
+      <a href="{% url 'blog_detail' post.slug %}" class="blog-card" style="display:block; color:inherit;">
+        {% if post.cover_image_url %}
+        <div class="blog-card-img"><img src="{{ post.cover_image_url }}" alt="{{ post.title }}"></div>
+        {% endif %}
+        <div class="blog-card-body">
+          {% if post.category %}<span class="blog-tag">{{ post.category.name }}</span>{% endif %}
+          <div class="blog-title">{{ post.title }}</div>
+          <div class="blog-excerpt">{{ post.excerpt|truncatechars:120 }}</div>
+          <div class="blog-meta">{{ post.created_at|date:"M d, Y" }}</div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- NEWSLETTER -->
+<section style="background: var(--ink); padding: 64px 0;">
+  <div class="container" style="text-align:center; max-width:560px; margin:0 auto;">
+    <div style="font-size:40px; margin-bottom:16px;">📬</div>
+    <h2 style="font-family:var(--font-display); font-size:32px; font-weight:800; color:white; margin-bottom:12px;">Get Weekly Deals</h2>
+    <p style="color:rgba(255,255,255,0.6); margin-bottom:32px;">The best affiliate deals of the week, curated and delivered to your inbox every Friday.</p>
+    <div style="display:flex; gap:12px; max-width:400px; margin:0 auto;">
+      <input type="email" placeholder="your@email.com" style="flex:1; padding:13px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); color:white; font-size:14px; font-family:var(--font-body); outline:none;">
+      <button class="btn btn-primary">Subscribe</button>
+    </div>
+    <p style="color:rgba(255,255,255,0.3); font-size:12px; margin-top:12px;">No spam. Unsubscribe anytime.</p>
+  </div>
+</section>
+
+{% endblock %}

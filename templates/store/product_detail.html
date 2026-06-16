@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% block title %}{% if product.meta_title %}{{ product.meta_title }}{% else %}{% if product.brand %}{{ product.brand }} — {% endif %}{{ product.title }} — ShopToolnix{% endif %}{% endblock %}
+{% block meta_desc %}{% if product.meta_description %}{{ product.meta_description }}{% elif product.short_description %}{{ product.short_description }}{% else %}{{ product.description|truncatechars:160 }}{% endif %}{% endblock %}
+{% block extra_head %}
+<meta property="og:title" content="{% if product.meta_title %}{{ product.meta_title }}{% else %}{{ product.title }}{% endif %}">
+<meta property="og:description" content="{% if product.meta_description %}{{ product.meta_description }}{% elif product.short_description %}{{ product.short_description }}{% else %}{{ product.description|truncatechars:160 }}{% endif %}">
+<meta property="og:image" content="{{ product.image_url }}">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.title }}",
+  "image": "{{ product.image_url }}",
+  "description": "{{ product.description|truncatechars:200 }}",
+  {% if product.brand %}"brand": { "@type": "Brand", "name": "{{ product.brand }}" },{% endif %}
+  {% if product.rating %}"aggregateRating": { "@type": "AggregateRating", "ratingValue": "{{ product.rating }}", "reviewCount": "{{ product.review_count|default:1 }}" },{% endif %}
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "price": "{{ product.display_price|default:0 }}",
+    "availability": "https://schema.org/InStock",
+    "url": "{{ request.build_absolute_uri }}"
+  }
+}
+</script>
+{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <!-- BREADCRUMB -->
+    <div style="font-size:13px; color:var(--muted); margin-bottom:32px;">
+      <a href="{% url 'home' %}" style="color:var(--muted);">Home</a> → 
+      {% if product.category %}<a href="{% url 'product_list' %}?category={{ product.category.slug }}" style="color:var(--muted);">{{ product.category.name }}</a> → {% endif %}
+      <span>{{ product.title|truncatechars:50 }}</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:start;">
+      <!-- IMAGE -->
+      <div>
+        <div style="background:var(--white); border:1px solid var(--border); border-radius:20px; aspect-ratio:1; display:flex; align-items:center; justify-content:center; padding:20px; position:relative; overflow:hidden;">
+          {% if product.image_url %}
+          <img src="{{ product.image_url }}" alt="{{ product.title }}" style="max-height:400px; object-fit:contain;">
+          {% else %}
+          <div style="font-size:96px; opacity:0.3;">🛍️</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- DETAILS -->
+      <div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <span class="product-platform platform-{{ product.platform }}" style="font-size:13px;">
+            {% if product.platform == 'amazon' %}🟡 Amazon Associate{% elif product.platform == 'ebay' %}🔵 eBay Partner{% else %}{{ product.get_platform_display }}{% endif %}
+          </span>
+          {% if product.is_deal_of_day %}<span class="badge-deal">⚡ Deal of the Day</span>{% endif %}
+          {% if product.discount_percent %}<span class="badge-discount">-{{ product.discount_percent }}%</span>{% endif %}
+        </div>
+
+        {% if product.brand %}
+        <div style="text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--accent); font-size:13px; margin-bottom:8px;">{{ product.brand }}</div>
+        {% endif %}
+        <h1 style="font-family:var(--font-display); font-size:28px; font-weight:800; letter-spacing:-0.5px; margin-bottom:16px;">{{ product.title }}</h1>
+
+        {% if product.rating %}
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px;">
+          <span style="color:#FFC107; font-size:18px;">★★★★★</span>
+          <span style="font-weight:600;">{{ product.rating }}</span>
+          <span style="color:var(--muted); font-size:14px;">({{ product.review_count }} reviews)</span>
+        </div>
+        {% endif %}
+
+        <div style="margin-bottom:28px;">
+          {% if product.display_price %}
+          <span style="font-family:var(--font-display); font-size:48px; font-weight:800; color:var(--accent);">${{ product.display_price }}</span>
+          {% endif %}
+          {% if product.original_price and product.sale_price %}
+          <span style="font-size:20px; color:var(--muted); text-decoration:line-through; margin-left:12px;">${{ product.original_price }}</span>
+          <span style="display:block; color:var(--teal); font-weight:600; font-size:15px; margin-top:4px;">You save ${{ product.original_price|floatformat:2 }} ({{ product.discount_percent }}% off)</span>
+          {% endif %}
+        </div>
+
+        {% if product.highlights.all %}
+        <ul style="margin:0 0 32px 0; padding-left:20px; color:var(--muted); line-height:1.6; font-size:15px; display:flex; flex-direction:column; gap:8px;">
+          {% for highlight in product.highlights.all %}
+          <li>{{ highlight.text }}</li>
+          {% endfor %}
+        </ul>
+        {% elif product.short_description %}
+        <p style="color:var(--muted); line-height:1.8; font-size:15px; margin-bottom:32px;">{{ product.short_description }}</p>
+        {% endif %}
+
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
+
+          {% if product.drop_info and product.drop_info.is_active %}
+          <!-- ✅ DROPSHIPPING: Add to Cart -->
+          {% if product.is_out_of_stock %}
+          <button disabled style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:18px; background:var(--muted); color:white; border-radius:14px; font-family:var(--font-display); font-size:18px; font-weight:700; border:none; cursor:not-allowed;">
+            Out of Stock
+          </button>
+          {% else %}
+          <form method="post" action="{% url 'add_to_cart' product.slug %}">
+            {% csrf_token %}
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:4px;">
+              <input type="number" name="quantity" value="1" min="1" max="99"
+                style="width:72px; padding:14px 10px; border:2px solid var(--border); border-radius:12px; font-size:16px; text-align:center; font-family:inherit;">
+              <button type="submit"
+                style="flex:1; display:flex; align-items:center; justify-content:center; gap:10px; padding:18px; background:var(--accent); color:white; border-radius:14px; font-family:var(--font-display); font-size:18px; font-weight:700; border:none; cursor:pointer; transition:all .15s;">
+                🛒 Add to Cart
+              </button>
+            </div>
+          </form>
+          <div style="display:flex; gap:10px; font-size:13px; color:var(--muted); padding: 0 4px;">
+            <span>📦 Ships in {{ product.drop_info.shipping_days_min }}–{{ product.drop_info.shipping_days_max }} days</span>
+            {% if product.drop_info.stock > 0 %}
+            <span style="color:#10B981; font-weight:600;">✅ In Stock</span>
+            {% endif %}
+          </div>
+          {% if product.is_affiliate %}
+          <a href="{% url 'checkout' %}"
+            style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:16px; background:var(--ink); color:white; border-radius:14px; font-size:16px; font-weight:700; text-decoration:none; transition:all .15s;">
+            ⚡ Buy Now
+          </a>
+          {% endif %}
+          {% endif %}
+
+          {% elif product.is_affiliate and product.affiliate_url %}
+          <!-- 🔗 AFFILIATE: External link -->
+          {% if product.is_out_of_stock %}
+          <button disabled style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:18px; background:var(--muted); color:white; border-radius:14px; font-family:var(--font-display); font-size:18px; font-weight:700; border:none; cursor:not-allowed;">
+            Out of Stock
+          </button>
+          {% else %}
+          <a href="{% url 'track_click' product.slug %}" target="_blank" rel="noopener noreferrer sponsored"
+            style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:18px; background:var(--accent); color:white; border-radius:14px; font-family:var(--font-display); font-size:18px; font-weight:700; text-decoration:none; transition:all 0.15s;">
+            Buy on {{ product.get_platform_display }} ↗
+          </a>
+          {% endif %}
+          {% endif %}
+
+          <!-- Additional Links -->
+          {% if product.is_affiliate %}
+          {% for link in product.additional_links.all %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer sponsored"
+            style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:16px; background:var(--ink); color:white; border-radius:14px; font-family:var(--font-display); font-size:16px; font-weight:600; text-decoration:none; transition:all 0.15s;">
+            {% if link.button_text %}{{ link.button_text }}{% else %}Buy on {{ link.get_platform_display }}{% endif %}
+            {% if link.price_override %}(${{ link.price_override }}){% endif %} ↗
+          </a>
+          {% endfor %}
+          {% endif %}
+        </div>
+        {% if product.is_affiliate and not product.drop_info %}
+        <p style="text-align:center; font-size:12px; color:var(--muted);">⚠️ Affiliate links — we earn a small commission at no extra cost to you</p>
+        {% endif %}
+
+        {% if product.tags.all %}
+        <div style="margin-top:24px; display:flex; flex-wrap:wrap; gap:8px;">
+          {% for tag in product.tags.all %}
+          <span style="background:var(--cream); color:var(--muted); font-size:12px; padding:4px 12px; border-radius:20px;">{{ tag.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- FREQUENTLY BOUGHT TOGETHER -->
+        {% if product.frequently_bought_together.all %}
+        <div style="margin-top:40px; padding-top:40px; border-top:1px solid var(--border);">
+          <h3 style="font-family:var(--font-display); font-size:18px; font-weight:700; margin-bottom:16px;">Frequently Bought Together</h3>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            {% for fbt in product.frequently_bought_together.all %}
+            <a href="{% url 'product_detail' fbt.slug %}" style="display:flex; align-items:center; gap:16px; padding:12px; border:1px solid var(--border); border-radius:12px; transition:all 0.15s; background:var(--white);">
+              {% if fbt.image_url %}
+              <img src="{{ fbt.image_url }}" style="width:60px; height:60px; object-fit:contain; background:var(--cream); border-radius:8px; padding:8px;">
+              {% else %}
+              <div style="width:60px; height:60px; background:var(--cream); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:24px;">🛍️</div>
+              {% endif %}
+              <div style="flex:1;">
+                <div style="font-weight:600; font-size:14px; color:var(--ink); display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">{{ fbt.title }}</div>
+                <div style="font-size:13px; color:var(--accent); font-weight:600; margin-top:4px;">${{ fbt.display_price }}</div>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- PRODUCT DETAILS & SPECS -->
+    <div style="margin-top:72px; padding-top:40px; border-top:1px solid var(--border);">
+      <style>
+        .details-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 60px; align-items: start; }
+        @media (max-width: 768px) { .details-grid { grid-template-columns: 1fr; gap: 40px; } }
+      </style>
+      <div class="details-grid">
+        <div>
+          <h2 class="section-title">Product <em>Description</em></h2>
+          <div style="color:var(--ink); line-height:1.8; font-size:16px;">
+            {{ product.description|linebreaks }}
+          </div>
+        </div>
+        <div>
+          <h2 class="section-title">Technical <em>Specs</em></h2>
+          {% if product.specifications.all %}
+          <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+            {% for spec in product.specifications.all %}
+            <div style="display:flex; justify-content:space-between; padding-bottom:12px; border-bottom:1px solid var(--border);">
+              <span style="font-weight:600; color:var(--ink);">{{ spec.name }}</span>
+              <span style="color:var(--muted); text-align:right;">{{ spec.value }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p style="color:var(--muted); font-size:14px;">No specifications available.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPLORE CATEGORIES -->
+    {% if categories %}
+    <div style="margin-top:72px;">
+      <div class="section-header">
+        <h2 class="section-title">Explore Other <em>Categories</em></h2>
+      </div>
+      <div class="category-grid">
+        {% for cat in categories %}
+        <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="category-card">
+          <div class="category-icon">{{ cat.icon }}</div>
+          <div class="category-name">{{ cat.name }}</div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- RELATED PRODUCTS -->
+    <div style="margin-top:72px; position:relative;">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 class="section-title" style="margin-bottom:0;">You Might Also <em>Like</em></h2>
+        <div style="display:flex; gap:12px;">
+          <button onclick="document.getElementById('related-slider').scrollBy({left: -document.getElementById('related-slider').offsetWidth, behavior: 'smooth'})" class="btn btn-outline" style="padding:8px 16px; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">&larr;</button>
+          <button onclick="document.getElementById('related-slider').scrollBy({left: document.getElementById('related-slider').offsetWidth, behavior: 'smooth'})" class="btn btn-outline" style="padding:8px 16px; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">&rarr;</button>
+        </div>
+      </div>
+      <style>
+        #related-slider::-webkit-scrollbar { display: none; }
+        .slider-item { width: calc(20% - 16px); min-width: calc(20% - 16px); flex-shrink: 0; scroll-snap-align: start; }
+        @media (max-width: 1024px) { .slider-item { width: calc(25% - 15px); min-width: calc(25% - 15px); } }
+        @media (max-width: 768px) { .slider-item { width: calc(33.333% - 13.33px); min-width: calc(33.333% - 13.33px); } }
+        @media (max-width: 480px) { .slider-item { width: calc(50% - 10px); min-width: calc(50% - 10px); } }
+      </style>
+      <div id="related-slider" style="display:flex; gap:20px; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none;">
+        {% for product in related %}
+        <div class="slider-item">
+          {% include "store/_product_card.html" %}
+        </div>
+        {% empty %}
+        <p style="color:var(--muted); padding:20px;">No other products in this category yet. Add some more products!</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

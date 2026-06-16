@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Search: {{ query }} — ShopToolnix{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 style="font-family:var(--font-display); font-size:36px; font-weight:800; margin-bottom:8px;">
+      {% if query %}Results for "{{ query }}"{% else %}Search Products{% endif %}
+    </h1>
+    <p style="color:var(--muted); margin-bottom:40px;">{{ products|length }} product{{ products|length|pluralize }} found</p>
+    <div class="product-grid">
+      {% for product in products %}{% include "store/_product_card.html" %}{% empty %}
+      <p style="color:var(--muted); grid-column:1/-1;">No results. Try different keywords.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us — ShopToolnix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .contact-container {
+    max-width: 600px;
+    margin: 64px auto;
+    background: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+  }
+  .contact-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .contact-subtitle {
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus {
+    border-color: var(--accent);
+  }
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .submit-btn:hover {
+    background: #e04400;
+  }
+  .form-error {
+    color: #d32f2f;
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="contact-container">
+    <h1 class="contact-title">Contact Us</h1>
+    <p class="contact-subtitle">Have a question, order issue, or want to list your products on our store? Drop us a message.</p>
+
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      {{ form.website }}
+
+      {% if form.non_field_errors %}
+        <div class="form-error">{{ form.non_field_errors|join:", " }}</div>
+      {% endif %}
+      
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <div class="form-error">{{ form.name.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="form-error">{{ form.email.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        {{ form.subject }}
+        {% if form.subject.errors %}
+          <div class="form-error">{{ form.subject.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Order Number (Optional)</label>
+        {{ form.order_number }}
+        {% if form.order_number.errors %}
+          <div class="form-error">{{ form.order_number.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        {{ form.message }}
+        {% if form.message.errors %}
+          <div class="form-error">{{ form.message.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="submit-btn">Send Message</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

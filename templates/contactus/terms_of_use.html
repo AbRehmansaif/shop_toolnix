@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms of Use — ShopToolnix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .policy-container {
+    max-width: 800px;
+    margin: 64px auto;
+    background: var(--white);
+    padding: 48px;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    line-height: 1.8;
+  }
+  .policy-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+  .policy-container h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    margin-top: 32px;
+    margin-bottom: 16px;
+  }
+  .policy-container p {
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="policy-container">
+    <h1 class="policy-title">Terms of Use</h1>
+    <p>Last Updated: {% now "F j, Y" %}</p>
+
+    <h2>1. Acceptance of Terms</h2>
+    <p>By accessing or using our website, you agree to be bound by these Terms of Use and all applicable laws.</p>
+
+    <h2>2. Intellectual Property</h2>
+    <p>All content on this site, including text, graphics, logos, and images, is the property of ShopToolnix or its content suppliers and protected by international copyright laws.</p>
+
+    <h2>3. Product Descriptions & Availability</h2>
+    <p>We attempt to be as accurate as possible. However, we do not warrant that product descriptions or other content is accurate, complete, reliable, current, or error-free. We reserve the right to modify prices and availability without notice.</p>
+
+    <h2>4. Shipping and Delivery</h2>
+    <p>Shipping times provided are estimates. We work with global fulfillment partners to bring you unique products, which means shipping times can vary based on your location and the origin of the product. We are not liable for delays caused by customs or carrier issues.</p>
+
+    <h2>5. Limitation of Liability</h2>
+    <p>ShopToolnix shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our services or products.</p>
+
+    <h2>6. Governing Law</h2>
+    <p>These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which ShopToolnix operates.</p>
+  </div>
+</div>
+{% endblock %}

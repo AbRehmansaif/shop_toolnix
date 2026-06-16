@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Refund Policy — ShopToolnix{% endblock %}
+
+{% block extra_css %}
+<style>
+  .policy-container {
+    max-width: 800px;
+    margin: 64px auto;
+    background: var(--white);
+    padding: 48px;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    line-height: 1.8;
+  }
+  .policy-title {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+  .policy-container h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    margin-top: 32px;
+    margin-bottom: 16px;
+  }
+  .policy-container p {
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="policy-container">
+    <h1 class="policy-title">Refund & Return Policy</h1>
+    <p>Last Updated: {% now "F j, Y" %}</p>
+
+    <h2>1. 30-Day Return Window</h2>
+    <p>We have a 30-day return policy, which means you have 30 days after receiving your item to request a return. To be eligible, your item must be in the same condition that you received it, unworn or unused, with tags, and in its original packaging.</p>
+
+    <h2>2. Shipping Times & Delays</h2>
+    <p>We source high-quality, unique products from fulfillment centers globally. Because of this, standard shipping times can range from 7 to 21 business days. <strong>We do not issue refunds for orders that are currently in transit within this timeframe.</strong> If your order has not arrived after 30 business days, please contact us for a full refund or replacement.</p>
+
+    <h2>3. Defective or Damaged Items</h2>
+    <p>Please inspect your order upon reception. If the item is defective, damaged, or if you received the wrong item, please contact us immediately with photo evidence so that we can evaluate the issue and make it right.</p>
+
+    <h2>4. How to Start a Return</h2>
+    <p>To start a return, please use our <a href="{% url 'contact' %}" style="color: var(--accent); text-decoration: underline;">Contact Us</a> page. If your return is accepted, we’ll send you instructions on how and where to send your package. Items sent back to us without first requesting a return will not be accepted.</p>
+
+    <h2>5. Refunds Processing</h2>
+    <p>We will notify you once we’ve received and inspected your return. If approved, you’ll be automatically refunded on your original payment method. Please remember it can take 3-7 business days for your bank or credit card company to process and post the refund.</p>
+  </div>
+</div>
+{% endblock %}

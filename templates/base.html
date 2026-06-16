@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ site_name|default:'ShopToolnix' }} — {{ site_tagline|default:'Best Deals' }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Discover the best affiliate deals from Amazon, eBay, and top brands. Curated products, honest reviews.{% endblock %}">
+  <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+  <meta property="og:site_name" content="{{ site_name|default:'ShopToolnix' }}">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0D0D0D;
+      --paper: #F7F6F3;
+      --cream: #EDEAE3;
+      --accent: #FF4D00;
+      --accent-soft: #FFF0EA;
+      --teal: #00897B;
+      --teal-soft: #E0F2F1;
+      --muted: #6B6860;
+      --border: #E0DDD6;
+      --white: #FFFFFF;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      --font-display: 'Inter', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* NAV */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1280px; margin: 0 auto;
+      padding: 0 24px;
+      display: flex; align-items: center; gap: 32px;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 4px; flex: 1; }
+    .nav-links a {
+      padding: 6px 14px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      transition: all 0.15s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--ink); background: var(--cream);
+    }
+    .nav-search {
+      display: flex; align-items: center;
+      background: var(--cream); border-radius: 10px;
+      padding: 0 14px; gap: 8px; flex: 0 0 280px;
+    }
+    .nav-search input {
+      border: none; background: transparent; outline: none;
+      font-family: var(--font-body); font-size: 14px;
+      color: var(--ink); width: 100%; padding: 10px 0;
+    }
+    .nav-search button {
+      border: none; background: none; cursor: pointer;
+      color: var(--muted); font-size: 16px;
+    }
+    .nav-actions { display: flex; gap: 8px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 20px; border-radius: 10px;
+      font-family: var(--font-body); font-size: 14px;
+      font-weight: 600; cursor: pointer; border: none;
+      transition: all 0.15s; text-decoration: none;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #e04400; transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
+    .btn-outline:hover { border-color: var(--ink); }
+    .btn-teal { background: var(--teal); color: white; }
+    .btn-teal:hover { background: #00796B; }
+    /* CART ICON */
+    .cart-btn {
+      position: relative; display: inline-flex; align-items: center;
+      justify-content: center; width: 42px; height: 42px;
+      border-radius: 10px; background: var(--cream);
+      font-size: 20px; text-decoration: none;
+      transition: background .15s;
+    }
+    .cart-btn:hover { background: var(--accent-soft); }
+    .cart-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--accent); color: #fff;
+      font-size: 10px; font-weight: 800;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--white);
+    }
+
+    /* ANNOUNCEMENT BAR */
+    .announcement {
+      background: var(--ink); color: white;
+      text-align: center; padding: 10px 24px;
+      font-size: 13px; font-weight: 500;
+    }
+    .announcement a { color: var(--accent); text-decoration: underline; }
+
+    /* LAYOUT */
+    .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: 64px 0; }
+    .section-sm { padding: 40px 0; }
+
+    /* SECTION HEADERS */
+    .section-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between; margin-bottom: 32px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 26px; font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .section-title em {
+      font-style: normal; color: var(--accent);
+    }
+    .section-link { font-size: 14px; color: var(--muted); font-weight: 500; }
+    .section-link:hover { color: var(--accent); }
+
+    /* PRODUCT CARD */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: var(--white); border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden; transition: all 0.2s;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+      border-color: transparent;
+    }
+    .product-card-img {
+      aspect-ratio: 1; overflow: hidden;
+      background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .product-card-img img {
+      width: 100%; height: 100%; object-fit: contain;
+      padding: 20px; transition: transform 0.3s;
+    }
+    .product-card:hover .product-card-img img { transform: scale(1.05); }
+    .product-card-img .no-img {
+      font-size: 48px; opacity: 0.3;
+    }
+    .product-card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .product-platform {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--muted);
+    }
+    .platform-amazon { color: #FF9900; }
+    .platform-ebay { color: #0064D2; }
+    .product-title {
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 600; line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .product-rating { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .stars { color: #FFC107; }
+    .product-price { display: flex; align-items: center; gap: 8px; margin-top: auto; flex-wrap: wrap; }
+    .price-now {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 700; color: var(--accent);
+    }
+    .price-was { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+    .badge-discount {
+      background: var(--accent); color: white;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 6px;
+    }
+    .badge-deal {
+      background: var(--teal); color: white;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 6px;
+    }
+    .product-card-footer { padding: 0 16px 16px; }
+    .btn-buy {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; width: 100%; padding: 10px;
+      background: var(--ink); color: white;
+      border-radius: 10px; font-size: 13px;
+      font-weight: 600; font-family: var(--font-body);
+      transition: all 0.15s; border: none; cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-buy:hover { background: var(--accent); transform: none; }
+
+    /* CATEGORIES */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+    .category-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px 16px;
+      text-align: center; transition: all 0.15s;
+      cursor: pointer; text-decoration: none; color: var(--ink);
+    }
+    .category-card:hover {
+      border-color: var(--accent); background: var(--accent-soft);
+      transform: translateY(-2px);
+    }
+    .category-icon { font-size: 32px; margin-bottom: 10px; }
+    .category-name { font-family: var(--font-display); font-size: 13px; font-weight: 700; }
+
+    /* BLOG CARD */
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .blog-card {
+      background: var(--white); border-radius: 16px;
+      border: 1px solid var(--border); overflow: hidden;
+      transition: all 0.2s;
+    }
+    .blog-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow); }
+    .blog-card-img { aspect-ratio: 16/9; background: var(--cream); overflow: hidden; }
+    .blog-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .blog-card-body { padding: 20px; }
+    .blog-tag {
+      display: inline-block; background: var(--teal-soft); color: var(--teal);
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.6px; padding: 3px 10px; border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .blog-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .blog-excerpt { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .blog-meta { margin-top: 14px; font-size: 12px; color: var(--muted); }
+
+    /* DEAL OF DAY */
+    .deal-banner {
+      background: linear-gradient(135deg, #0D0D0D 60%, #1a1a1a);
+      border-radius: 20px; padding: 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: center; color: white;
+    }
+    .deal-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent); color: white;
+      font-size: 12px; font-weight: 700;
+      padding: 4px 12px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+    .deal-title { font-family: var(--font-display); font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+    .deal-price { font-family: var(--font-display); font-size: 48px; font-weight: 800; color: var(--accent); }
+    .deal-was { font-size: 16px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+    .deal-img { aspect-ratio: 1; background: rgba(255,255,255,0.05); border-radius: 16px;
+      display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .deal-img img { max-height: 280px; object-fit: contain; }
+
+    /* FOOTER */
+    footer {
+      background: var(--ink); color: rgba(255,255,255,0.7);
+      padding: 56px 0 32px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 48px;
+    }
+    .footer-brand .nav-logo { color: white; margin-bottom: 12px; }
+    .footer-brand p { font-size: 14px; line-height: 1.7; }
+    .footer-col h4 {
+      font-family: var(--font-display); font-weight: 700;
+      color: white; margin-bottom: 16px; font-size: 14px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-col ul a { font-size: 14px; transition: color 0.15s; }
+    .footer-col ul a:hover { color: var(--accent); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px; display: flex;
+      justify-content: space-between; align-items: center;
+      font-size: 12px;
+    }
+    .affiliate-disclosure {
+      background: rgba(255,255,255,0.05); border-radius: 10px;
+      padding: 16px; font-size: 12px; line-height: 1.6;
+      margin-bottom: 32px; color: rgba(255,255,255,0.5);
+    }
+    .affiliate-disclosure strong { color: rgba(255,255,255,0.8); }
+
+    /* MESSAGES */
+    .messages { padding: 12px 24px; }
+    .message { padding: 12px 16px; border-radius: 10px; margin-bottom: 8px; font-size: 14px; }
+    .message.success { background: var(--teal-soft); color: var(--teal); }
+    .message.error { background: #FEE; color: #C00; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-search { flex: 1; }
+      .deal-banner { grid-template-columns: 1fr; }
+      .deal-img { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .deal-price { font-size: 36px; }
+    }
+    @media (max-width: 480px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <div class="announcement">
+    🔥 New deals added daily — <a href="{% url 'deals' %}">See today's top discounts</a> &nbsp;|&nbsp; We offer direct products & curated affiliate deals.
+  </div>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="{% url 'home' %}" class="nav-logo">🛍️ Shop<span>Toolnix</span></a>
+      <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'product_list' %}">All Products</a>
+        <a href="{% url 'deals' %}">🔥 Deals</a>
+        <a href="{% url 'blogs:blog_list' %}">Blog</a>
+        <a href="{% url 'order_tracking' %}">📦 Track Order</a>
+      </div>
+      <form class="nav-search" action="{% url 'search' %}" method="get">
+        <button type="submit">🔍</button>
+        <input type="text" name="q" placeholder="Search products..." value="{{ request.GET.q }}">
+      </form>
+      <div class="nav-actions">
+        <a href="{% url 'cart' %}" class="cart-btn" title="Cart">
+          🛒
+          {% if cart_count %}
+          <span class="cart-badge">{{ cart_count }}</span>
+          {% endif %}
+        </a>
+        <a href="https://toolnix.pro" class="btn btn-outline" target="_blank">← toolnix.pro</a>
+      </div>
+    </div>
+  </nav>
+
+  {% if messages %}
+  <div class="messages container">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    <div class="container">
+      <div class="affiliate-disclosure">
+        <strong>Store & Affiliate Disclosure:</strong> ShopToolnix offers curated products directly through our store and participates in affiliate programs like the Amazon Associates Program. Whether you purchase directly from us or click our affiliate links to make a purchase, it helps keep our site running and allows us to bring you the best deals. Thank you for your support!
+      </div>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo">🛍️ Shop<span style="color:var(--accent)">Toolnix</span></div>
+          <p>Curated affiliate deals from Amazon, eBay, and top brands. We do the research so you don't have to.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="{% url 'product_list' %}">All Products</a></li>
+            <li><a href="{% url 'deals' %}">Today's Deals</a></li>
+            {% for cat in categories %}
+            <li><a href="{% url 'product_list' %}?category={{ cat.slug }}">{{ cat.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Content</h4>
+          <ul>
+            <li><a href="{% url 'blogs:blog_list' %}">Blog & Reviews</a></li>
+            <li><a href="{% url 'search' %}">Search</a></li>
+            <li><a href="{% url 'order_tracking' %}">Track Order</a></li>
+            <li><a href="https://toolnix.pro" target="_blank">Free Tools</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="{% url 'privacy_policy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'terms_of_use' %}">Terms of Use</a></li>
+            <li><a href="{% url 'refund_policy' %}">Refund Policy</a></li>
+            <li><a href="{% url 'contact' %}">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 ShopToolnix.pro — All rights reserved</span>
+        <span>Part of the <a href="https://toolnix.pro" style="color:var(--accent)">Toolnix</a> family</span>
+      </div>
+    </div>
+  </footer>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

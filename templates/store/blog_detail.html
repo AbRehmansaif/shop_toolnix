@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }} — ShopToolnix{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    {% if post.category %}<span class="blog-tag" style="display:inline-block; margin-bottom:16px;">{{ post.category.name }}</span>{% endif %}
+    <h1 style="font-family:var(--font-display); font-size:40px; font-weight:800; letter-spacing:-1px; margin-bottom:16px;">{{ post.title }}</h1>
+    <p style="color:var(--muted); font-size:14px; margin-bottom:32px;">{{ post.created_at|date:"F d, Y" }}</p>
+    {% if post.cover_image_url %}
+    <img src="{{ post.cover_image_url }}" style="width:100%; border-radius:16px; margin-bottom:40px;" alt="{{ post.title }}">
+    {% endif %}
+    <div style="font-size:16px; line-height:1.9; color:#2a2a2a;">{{ post.content|linebreaks }}</div>
+    
+    {% if post.related_products.all %}
+    <div style="margin-top:56px; padding-top:40px; border-top:1px solid var(--border);">
+      <h2 style="font-family:var(--font-display); font-size:24px; font-weight:700; margin-bottom:24px;">Products Mentioned</h2>
+      <div class="product-grid" style="grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));">
+        {% for product in post.related_products.all %}
+        {% include "store/_product_card.html" %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Payment Cancelled — ShopToolnix{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 80px auto; text-align: center; padding: 40px; background: var(--white); border-radius: 16px; box-shadow: var(--card-shadow);">
+  <h1 style="color: #EF4444; font-size: 2rem; margin-bottom: 16px;">Payment Failed or Cancelled</h1>
+  <p style="color: var(--muted); margin-bottom: 24px;">Your payment for Order #{{ order.order_number }} could not be completed.</p>
+  <a href="{% url 'checkout' %}" style="display: inline-block; padding: 14px 24px; background: var(--accent); color: white; border-radius: 8px; font-weight: 700; text-decoration: none;">Try Checkout Again</a>
+</div>
+{% endblock %}

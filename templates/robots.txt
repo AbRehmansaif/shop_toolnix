@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /store-management-portal/
+Disallow: /cart/
+Disallow: /checkout/
+
+Sitemap: https://shoptoolnix.pro/sitemap.xml

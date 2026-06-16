@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Today's Deals — ShopToolnix{% endblock %}
+{% block content %}
+
+<div style="background:linear-gradient(135deg,var(--accent),#c03d00); padding:48px 0; color:white; text-align:center;">
+  <div class="container">
+    <div style="font-size:48px; margin-bottom:12px;">🔥</div>
+    <h1 style="font-family:var(--font-display); font-size:48px; font-weight:800; letter-spacing:-1px;">Today's Best Deals</h1>
+    <p style="font-size:18px; opacity:0.85; margin-top:8px;">Biggest discounts across Globe.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="product-grid">
+      {% for product in deals %}
+      {% include "store/_product_card.html" %}
+      {% empty %}
+      <div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--muted);">
+        <div style="font-size:48px; margin-bottom:16px;">🛒</div>
+        <h3 style="font-family:var(--font-display);">No deals right now</h3>
+        <p style="margin-top:8px;">Check back soon or <a href="{% url 'product_list' %}" style="color:var(--accent);">browse all products</a></p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

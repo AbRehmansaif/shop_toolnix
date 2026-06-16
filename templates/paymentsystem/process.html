@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Complete Payment — ShopToolnix{% endblock %}
+
+{% block content %}
+<style>
+  .payment-wrap { max-width: 600px; margin: 60px auto; padding: 40px; background: var(--white); border-radius: 16px; box-shadow: var(--card-shadow); }
+  .payment-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 24px; text-align: center; }
+  .order-summary { background: var(--paper); padding: 16px; border-radius: 10px; margin-bottom: 24px; border: 1px solid var(--border); }
+  .order-summary h4 { margin-bottom: 8px; font-weight: 700; }
+  .order-summary p { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+  .order-total { font-size: 1.2rem; font-weight: 800; color: var(--accent); margin-top: 10px; }
+  
+  #payment-form { display: flex; flex-direction: column; gap: 20px; }
+  #payment-element { margin-bottom: 16px; }
+  #submit { background: var(--accent); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: transform 0.2s; }
+  #submit:hover { transform: translateY(-2px); }
+  #submit:disabled { opacity: 0.7; cursor: not-allowed; }
+  #error-message { color: #EF4444; font-size: 14px; text-align: center; }
+</style>
+
+<div class="payment-wrap">
+  <h1 class="payment-title">Complete Your Payment</h1>
+  
+  <div class="order-summary">
+    <h4>Order #{{ order.order_number }}</h4>
+    <p>Name: {{ order.first_name }} {{ order.last_name }}</p>
+    <p>Email: {{ order.email }}</p>
+    <div class="order-total">Total: ${{ order.total_price }}</div>
+  </div>
+
+  <form id="payment-form" data-secret="{{ client_secret }}">
+    <div id="payment-element">
+      <!-- Elements will create form elements here -->
+    </div>
+    <button id="submit">
+      <span id="button-text">Pay Now</span>
+    </button>
+    <div id="error-message"></div>
+  </form>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const options = {
+      clientSecret: '{{ client_secret }}',
+      appearance: { theme: 'stripe' },
+    };
+
+    const elements = stripe.elements(options);
+    const paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      submitButton.disabled = true;
+
+      const {error} = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: window.location.origin + "{% url 'paymentsystem:success' order.order_number %}",
+        },
+      });
+
+      if (error) {
+        const messageContainer = document.querySelector('#error-message');
+        messageContainer.textContent = error.message;
+        submitButton.disabled = false;
+      }
+    });
+  });
+</script>
+{% endblock %}

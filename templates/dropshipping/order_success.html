@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Order Confirmed — ShopToolnix{% endblock %}
+
+{% block content %}
+<style>
+  .success-wrap { max-width: 700px; margin: 0 auto; padding: 60px 20px; text-align: center; }
+  .success-icon { font-size: 80px; animation: popIn .5s ease; margin-bottom: 16px; }
+  @keyframes popIn { 0%{transform:scale(0)} 80%{transform:scale(1.1)} 100%{transform:scale(1)} }
+  .success-wrap h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; }
+  .success-wrap h1 span { color: var(--accent); }
+  .success-wrap p.sub { color: var(--muted); font-size: 16px; margin-bottom: 36px; }
+
+  .order-card { background: var(--white); border-radius: 20px; padding: 32px; box-shadow: var(--card-shadow); text-align: left; margin-bottom: 28px; }
+  .order-card h2 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 20px; }
+  .order-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:480px){ .order-meta { grid-template-columns: 1fr; } }
+  .meta-item label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; display: block; margin-bottom: 3px; }
+  .meta-item span { font-weight: 700; font-size: 15px; }
+  .status-chip { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; color: #fff; }
+
+  .items-section { background: var(--white); border-radius: 20px; padding: 28px; box-shadow: var(--card-shadow); text-align: left; margin-bottom: 28px; }
+  .items-section h2 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 18px; }
+  .order-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .order-item:last-child { border-bottom: none; }
+  .order-item img { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; background: var(--cream); }
+  .order-item .name { font-weight: 600; flex: 1; }
+  .order-item .qty { color: var(--muted); font-size: 13px; }
+  .order-item .price { font-weight: 700; color: var(--accent); }
+
+  .address-section { background: var(--white); border-radius: 20px; padding: 28px; box-shadow: var(--card-shadow); text-align: left; margin-bottom: 32px; }
+  .address-section h2 { font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 12px; }
+  .address-section p { font-size: 15px; line-height: 1.8; color: var(--ink); }
+
+  .btn-track { display: inline-block; padding: 14px 32px; background: var(--accent); color: #fff; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; margin-right: 12px; transition: transform .15s; }
+  .btn-track:hover { transform: translateY(-2px); }
+  .btn-shop { display: inline-block; padding: 14px 32px; border: 2px solid var(--border); color: var(--ink); border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; transition: border-color .2s; }
+  .btn-shop:hover { border-color: var(--accent); color: var(--accent); }
+
+  .payment-info { background: var(--teal-soft); border: 2px solid var(--teal); border-radius: 14px; padding: 18px 22px; text-align: left; margin-bottom: 28px; }
+  .payment-info h3 { color: var(--teal); font-weight: 700; margin-bottom: 6px; }
+  .payment-info p { color: #004D40; font-size: 14px; line-height: 1.6; }
+</style>
+
+<div class="success-wrap">
+  <div class="success-icon">✅</div>
+  <h1>Order <span>Confirmed!</span></h1>
+  <p class="sub">Thank you, {{ order.full_name }}! Your order has been received and is being processed.</p>
+
+  <!-- Order Details -->
+  <div class="order-card">
+    <h2>Order Details</h2>
+    <div class="order-meta">
+      <div class="meta-item">
+        <label>Order Number</label>
+        <span style="color:var(--accent);">{{ order.order_number }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Status</label>
+        <span class="status-chip" style="background:{{ order.get_status_color }};">{{ order.get_status_display }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Payment Method</label>
+        <span>{{ order.get_payment_method_display }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Order Total</label>
+        <span style="color:var(--accent);">${{ order.total_price }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment instructions for COD / Bank -->
+  {% if order.payment_method == 'cod' %}
+  <div class="payment-info">
+    <h3>💵 Cash on Delivery</h3>
+    <p>You will pay <strong>${{ order.total_price }}</strong> when your order is delivered to your door. No upfront payment needed!</p>
+  </div>
+  {% elif order.payment_method == 'bank' %}
+  <div class="payment-info">
+    <h3>🏦 Bank Transfer Instructions</h3>
+    <p>Please transfer <strong>${{ order.total_price }}</strong> to the following account and send proof of payment to our email:<br>
+       <strong>Bank:</strong> Meezan Bank &nbsp;|&nbsp; <strong>Account:</strong> 0123-4567890-01<br>
+       <strong>Title:</strong> ShopToolnix &nbsp;|&nbsp; <strong>Ref:</strong> {{ order.order_number }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Order Items -->
+  <div class="items-section">
+    <h2>Items Ordered</h2>
+    {% for item in order.items.all %}
+    <div class="order-item">
+      {% if item.product_image %}
+        <img src="{{ item.product_image }}" alt="{{ item.product_title }}">
+      {% else %}
+        <div style="width:56px;height:56px;background:var(--cream);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🛍️</div>
+      {% endif %}
+      <div class="name">{{ item.product_title }}</div>
+      <div class="qty">× {{ item.quantity }}</div>
+      <div class="price">${{ item.subtotal }}</div>
+    </div>
+    {% endfor %}
+    <div style="display:flex;justify-content:space-between;padding-top:14px;font-weight:800;font-size:16px;">
+      <span>Total</span><span style="color:var(--accent);">${{ order.total_price }}</span>
+    </div>
+  </div>
+
+  <!-- Shipping Address -->
+  <div class="address-section">
+    <h2>📍 Shipping To</h2>
+    <p>
+      <strong>{{ order.full_name }}</strong><br>
+      {{ order.address_line1 }}{% if order.address_line2 %}, {{ order.address_line2 }}{% endif %}<br>
+      {{ order.city }}{% if order.state %}, {{ order.state }}{% endif %} {{ order.postal_code }}<br>
+      {{ order.country }}
+    </p>
+  </div>
+
+  <a href="{% url 'order_tracking' %}" class="btn-track">📦 Track My Order</a>
+  <a href="{% url 'product_list' %}" class="btn-shop">Continue Shopping</a>
+
+  <p style="margin-top:24px;color:var(--muted);font-size:13px;">
+    A confirmation has been noted for order <strong>{{ order.order_number }}</strong>. Contact us if you have any questions.
+  </p>
+</div>
+{% endblock %}

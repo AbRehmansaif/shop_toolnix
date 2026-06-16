@@ -1,0 +1,52 @@
+<div class="product-card">
+  {% if product.discount_percent %}
+  <span class="badge-discount" style="position: absolute; top: 16px; left: 16px; z-index: 10; font-size: 13px; padding: 4px 8px; border-radius: 8px;">-{{ product.discount_percent }}%</span>
+  {% endif %}
+  <a href="{% url 'product_detail' product.slug %}" class="product-card-img">
+    {% if product.image_url %}
+    <img src="{{ product.image_url }}" alt="{{ product.title }}" loading="lazy">
+    {% else %}
+    <span class="no-img">🛍️</span>
+    {% endif %}
+  </a>
+  <div class="product-card-body">
+    <div class="product-platform platform-{{ product.platform }}">
+      {% if product.platform == 'amazon' %}🟡 Amazon
+      {% elif product.platform == 'ebay' %}🔵 eBay
+      {% else %}{{ product.get_platform_display }}{% endif %}
+    </div>
+    <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.title }}</a>
+    {% if product.rating %}
+    <div class="product-rating">
+      <span class="stars">★★★★★</span>
+      <span>{{ product.rating }} ({{ product.review_count }})</span>
+    </div>
+    {% endif %}
+    <div class="product-price">
+      {% if product.display_price %}
+      <span class="price-now">${{ product.display_price }}</span>
+      {% endif %}
+      {% if product.original_price and product.sale_price %}
+      <span class="price-was">${{ product.original_price }}</span>
+      {% endif %}
+      {% if product.is_deal_of_day %}
+      <span class="badge-deal">⚡ Deal</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="product-card-footer">
+    {% if product.is_out_of_stock %}
+    <button disabled class="btn-buy" style="background:var(--muted); cursor:not-allowed; border:none; width:100%; font-family:inherit; font-size:14px;">
+      Out of Stock
+    </button>
+    {% elif product.platform == 'dropship' or product.drop_info %}
+    <a href="{% url 'product_detail' product.slug %}" class="btn-buy">
+      🛒 View Details
+    </a>
+    {% elif product.is_affiliate and product.affiliate_url %}
+    <a href="{% url 'track_click' product.slug %}" class="btn-buy" target="_blank" rel="noopener noreferrer sponsored">
+      Buy Now ↗
+    </a>
+    {% endif %}
+  </div>
+</div>

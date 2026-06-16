@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block title %}Track Your Order — ShopToolnix{% endblock %}
+
+{% block content %}
+<style>
+  .track-wrap { max-width: 700px; margin: 0 auto; padding: 60px 20px; }
+  .track-wrap h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; }
+  .track-wrap h1 span { color: var(--accent); }
+  .track-wrap .sub { color: var(--muted); margin-bottom: 36px; }
+
+  /* Search form */
+  .search-card { background: var(--white); border-radius: 20px; padding: 32px; box-shadow: var(--card-shadow); margin-bottom: 32px; }
+  .search-card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+  .form-group input { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; background: var(--paper); transition: border-color .2s; }
+  .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,77,0,.12); }
+  .btn-track { display: block; width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: transform .15s, box-shadow .15s; }
+  .btn-track:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,77,0,.35); }
+
+  /* Not found */
+  .not-found { background: #FEF2F2; border: 2px solid #FECACA; border-radius: 14px; padding: 20px 24px; color: #B91C1C; }
+  .not-found strong { display: block; margin-bottom: 4px; }
+
+  /* Result card */
+  .result-card { background: var(--white); border-radius: 20px; padding: 32px; box-shadow: var(--card-shadow); }
+  .result-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+  .result-header h2 { font-size: 1.3rem; font-weight: 800; }
+  .status-chip { display: inline-block; padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; color: #fff; }
+  .order-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+  @media(max-width:480px){ .order-meta { grid-template-columns: 1fr; } }
+  .meta-item label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; display: block; margin-bottom: 3px; }
+  .meta-item span { font-weight: 700; font-size: 14px; }
+
+  /* Progress stepper */
+  .stepper { display: flex; justify-content: space-between; position: relative; margin-bottom: 32px; }
+  .stepper::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 3px; background: var(--border); z-index: 0; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; position: relative; z-index: 1; }
+  .step-dot { width: 42px; height: 42px; border-radius: 50%; border: 3px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all .3s; }
+  .step.done .step-dot { border-color: #10B981; background: #10B981; }
+  .step.active .step-dot { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 5px rgba(255,77,0,.2); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 5px rgba(255,77,0,.2)} 50%{box-shadow:0 0 0 10px rgba(255,77,0,.05)} }
+  .step-label { font-size: 11px; font-weight: 700; text-align: center; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .step.done .step-label, .step.active .step-label { color: var(--ink); }
+
+  /* Items */
+  .items-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 14px; }
+  .order-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .order-item:last-child { border-bottom: none; }
+  .order-item img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; background: var(--cream); }
+  .order-item .name { flex: 1; font-weight: 600; font-size: 14px; }
+  .order-item .qty { color: var(--muted); font-size: 13px; }
+  .order-item .price { font-weight: 700; color: var(--accent); }
+</style>
+
+<div class="track-wrap">
+  <h1>Track Your <span>Order</span></h1>
+  <p class="sub">Enter your order number and email address to check your order status.</p>
+
+  <!-- Search Form -->
+  <div class="search-card">
+    <h2>🔍 Lookup Order</h2>
+    <form method="get" action="{% url 'order_tracking' %}" id="tracking-form" novalidate>
+      <div class="form-group">
+        <label>Order Number</label>
+        <input type="text" name="order_number" placeholder="ORD-12345678" required maxlength="50" pattern="^ORD-\d+$"
+               value="{% if input_order_number %}{{ input_order_number }}{% elif order %}{{ order.order_number }}{% endif %}">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="email" placeholder="you@example.com" required maxlength="100"
+               value="{% if input_email %}{{ input_email }}{% elif order %}{{ order.email }}{% endif %}">
+      </div>
+      <button type="submit" class="btn-track">Track Order →</button>
+      <div id="form-error" style="display:none; color:#EF4444; font-size:13px; font-weight:600; margin-top:12px; text-align:center;">Please fill in all required fields.</div>
+    </form>
+  </div>
+
+  <!-- Validation Error / Not Found -->
+  {% if error_msg %}
+  <div class="not-found" style="margin-bottom:24px;">
+    <strong>⚠️ Validation Error</strong>
+    {{ error_msg }}
+  </div>
+  {% elif searched and not order %}
+  <div class="not-found" style="margin-bottom:24px;">
+    <strong>❌ Order not found</strong>
+    No order was found with that number and email. Please check and try again.
+  </div>
+  {% endif %}
+
+  <!-- Found Order -->
+  {% if order %}
+  <div class="result-card">
+    <div class="result-header">
+      <h2>Order #{{ order.order_number }}</h2>
+      <span class="status-chip" style="background:{{ order.get_status_color }};">{{ order.get_status_display }}</span>
+    </div>
+
+    <!-- Progress Stepper -->
+    {% with s=order.status %}
+    <div class="stepper">
+      <div class="step {% if s in 'paid ordered shipped delivered' %}done{% elif s == 'pending' %}active{% endif %}">
+        <div class="step-dot">📋</div>
+        <div class="step-label">Placed</div>
+      </div>
+      <div class="step {% if s in 'ordered shipped delivered' %}done{% elif s == 'paid' %}active{% endif %}">
+        <div class="step-dot">💳</div>
+        <div class="step-label">Paid</div>
+      </div>
+      <div class="step {% if s in 'shipped delivered' %}done{% elif s == 'ordered' %}active{% endif %}">
+        <div class="step-dot">📦</div>
+        <div class="step-label">Processing</div>
+      </div>
+      <div class="step {% if s == 'delivered' %}done{% elif s == 'shipped' %}active{% endif %}">
+        <div class="step-dot">🚚</div>
+        <div class="step-label">Shipped</div>
+      </div>
+      <div class="step {% if s == 'delivered' %}active{% endif %}">
+        <div class="step-dot">✅</div>
+        <div class="step-label">Delivered</div>
+      </div>
+    </div>
+    {% endwith %}
+
+    <!-- Meta -->
+    <div class="order-meta">
+      <div class="meta-item">
+        <label>Order Date</label>
+        <span>{{ order.created_at|date:"d M Y" }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Payment</label>
+        <span>{{ order.get_payment_method_display }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Shipping To</label>
+        <span>{{ order.city }}, {{ order.country }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Order Total</label>
+        <span style="color:var(--accent);">${{ order.total_price }}</span>
+      </div>
+    </div>
+
+    <!-- Status Updates -->
+    {% if order.status_updates.all %}
+    <div class="items-title" style="margin-top: 32px;">Order History & Notes</div>
+    <div class="updates-list" style="margin-bottom: 32px;">
+      {% for update in order.status_updates.all %}
+      <div class="update-item" style="padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--paper); border-radius: 0 8px 8px 0; margin-bottom: 10px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <strong style="font-size:14px;">{{ update.get_status_display }}</strong>
+          <span style="font-size:12px; color:var(--muted);">{{ update.created_at|date:"d M Y, h:i a" }}</span>
+        </div>
+        {% if update.note %}
+        <div style="font-size:13px; color:var(--ink); margin-top:4px;">{{ update.note }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Items -->
+    <div class="items-title">Items in this order</div>
+    {% for item in order.items.all %}
+    <div class="order-item">
+      {% if item.product_image %}
+        <img src="{{ item.product_image }}" alt="{{ item.product_title }}">
+      {% else %}
+        <div style="width:48px;height:48px;background:var(--cream);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🛍️</div>
+      {% endif %}
+      <div class="name">{{ item.product_title|truncatechars:55 }}</div>
+      <div class="qty">× {{ item.quantity }}</div>
+      <div class="price">${{ item.subtotal }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<script>
+  document.getElementById('tracking-form').addEventListener('submit', function(e) {
+    var orderInput = document.querySelector('input[name="order_number"]');
+    var emailInput = document.querySelector('input[name="email"]');
+    var errorDiv = document.getElementById('form-error');
+    var isValid = true;
+    
+    // Reset styles
+    orderInput.style.borderColor = 'var(--border)';
+    emailInput.style.borderColor = 'var(--border)';
+    errorDiv.style.display = 'none';
+    
+    if (!orderInput.value.trim()) {
+      orderInput.style.borderColor = '#EF4444';
+      isValid = false;
+    }
+    
+    if (!emailInput.value.trim()) {
+      emailInput.style.borderColor = '#EF4444';
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      e.preventDefault();
+      errorDiv.style.display = 'block';
+    }
+  });
+</script>
+{% endblock %}
