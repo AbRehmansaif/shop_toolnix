@@ -94,7 +94,7 @@ def product_detail(request, slug):
     ).exclude(id=product.id)[:20]
     if not related:
         related = Product.objects.filter(is_active=True).exclude(id=product.id)[:20]
-    categories = Category.objects.all()
+    categories = Category.objects.filter(parent__isnull=True)
     return render(request, "store/product_detail.html", {
         "product": product,
         "related": related,

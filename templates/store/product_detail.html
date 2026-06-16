@@ -237,14 +237,20 @@
     <!-- EXPLORE CATEGORIES -->
     {% if categories %}
     <div style="margin-top:72px;">
-      <div class="section-header">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
         <h2 class="section-title">Explore Other <em>Categories</em></h2>
+        <div class="hide-on-mobile" style="display:flex; gap:12px;">
+          <button onclick="document.getElementById('cat-slider').scrollBy({left: -200, behavior: 'smooth'})" class="btn btn-outline" style="padding:8px 16px; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">&larr;</button>
+          <button onclick="document.getElementById('cat-slider').scrollBy({left: 200, behavior: 'smooth'})" class="btn btn-outline" style="padding:8px 16px; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">&rarr;</button>
+        </div>
       </div>
-      <div class="category-grid">
+      <style>
+        #cat-slider::-webkit-scrollbar { display: none; }
+      </style>
+      <div id="cat-slider" style="display:flex; gap:12px; overflow-x:auto; scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none; padding-bottom:8px;">
         {% for cat in categories %}
-        <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="category-card">
-          <div class="category-icon">{{ cat.icon }}</div>
-          <div class="category-name">{{ cat.name }}</div>
+        <a href="{% url 'product_list' %}?category={{ cat.slug }}" style="flex-shrink:0; scroll-snap-align:start; display:flex; align-items:center; gap:8px; padding:10px 20px; background:var(--white); border:1px solid var(--border); border-radius:30px; text-decoration:none; color:var(--ink); font-weight:600; font-size:14px; transition:all 0.15s; box-shadow:0 2px 4px rgba(0,0,0,0.02);" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--accent)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--ink)'; this.style.transform='none';">
+          <span style="font-size:16px;">{{ cat.icon }}</span> <span>{{ cat.name }}</span>
         </a>
         {% endfor %}
       </div>
