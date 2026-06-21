@@ -148,3 +148,84 @@ def search(request):
         is_active=True
     ) if query else Product.objects.none()
     return render(request, "store/search.html", {"products": products, "query": query})
+
+
+def best_smart_home_security_system_2026(request):
+    # Fetch products from the home-security-cameras-smart-doorbells category or similar
+    # Assuming slug is 'home-security-cameras-smart-doorbells' or we can query by name
+    products = Product.objects.filter(
+        category__slug__icontains='security',
+        is_active=True
+    )
+    if not products.exists():
+        products = Product.objects.filter(
+            Q(title__icontains='security') | Q(title__icontains='camera') | Q(title__icontains='doorbell'),
+            is_active=True
+        )
+    if not products.exists():
+        # Fallback to display some products if none match the filters
+        products = Product.objects.filter(is_active=True)
+    
+    categories = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories')
+    current_category = "home-security-cameras-smart-doorbells"
+    
+    try:
+        active_cat = Category.objects.get(slug=current_category)
+        if active_cat.parent:
+            related_subcats = active_cat.parent.subcategories.all()
+            parent_cat = active_cat.parent
+        else:
+            related_subcats = active_cat.subcategories.all()
+            parent_cat = active_cat
+    except Category.DoesNotExist:
+        # Fallback if slug doesn't exist in db
+        parent_cat = Category.objects.filter(parent__isnull=True).first()
+        if parent_cat:
+            related_subcats = parent_cat.subcategories.all()
+            if not related_subcats.exists():
+                related_subcats = Category.objects.filter(parent__isnull=True)
+        else:
+            related_subcats = Category.objects.all()
+    
+    sort = request.GET.get("sort", "-created_at")
+    sort_map = {
+        "newest": "-created_at",
+        "price_low": "sale_price",
+        "price_high": "-sale_price",
+        "popular": "-click_count",
+        "rating": "-rating",
+    }
+    products = products.order_by(sort_map.get(sort, "-created_at"))
+
+    return render(request, "subcategory_pages/best_smart_home_security_system_2026.html", {
+        "products": products[:20],  # show top 20
+        "categories": categories,
+        "current_category": current_category,
+        "related_subcats": related_subcats,
+        "parent_cat": parent_cat,
+        "sort": sort,
+    })
+
+
+def subcategory_pages_list(request):
+    # Hardcoded list of subcategory/guide pages for now
+    guides_data = [
+        {
+            'title': 'Best Smart Home Security System 2026, Compare & Buy',
+            'slug': 'best-smart-home-security-system-2026',
+            'excerpt': 'Discover the best smart home security systems 2026, trusted expert reviews, all budgets covered. Compare features side by side and shop smarter today.',
+            'category': 'Smart Home > Home Security Cameras, Smart Doorbell Products',
+            'created_at': 'June 21, 2026',
+            'image_url': '/static/subcategory_pages/images/smart-home-security-devices.jpg',
+            'alt_text': 'Collection of smart home security devices including a camera, sensors, and a smart bulb',
+            'url_name': 'best_smart_home_security_system_2026'
+        }
+    ]
+    
+    paginator = Paginator(guides_data, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, "subcategory_pages/subcategory_pages_list.html", {"page_obj": page_obj})
+
+

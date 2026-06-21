@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Buying Guides & Best Picks — ShopToolnix{% endblock %}
+{% block meta_desc %}Browse our latest buying guides and best picks to find the right products for your needs.{% endblock %}
+
+{% block content %}
+<div style="background:var(--cream); border-bottom:1px solid var(--border); padding:48px 0;">
+  <div class="container" style="text-align:center;">
+    <h1 style="font-family:var(--font-display); font-size:48px; font-weight:800; letter-spacing:-1px;">Buying Guides</h1>
+    <p style="color:var(--muted); margin-top:8px; font-size:17px;">In depth comparisons, reviews, and best picks for 2026</p>
+  </div>
+</div>
+<section class="section">
+  <div class="container">
+    <div class="blog-grid">
+      {% for guide in page_obj %}
+      <a href="{% url guide.url_name %}" class="blog-card" style="display:block; color:inherit;">
+        {% if guide.image_url %}
+        <div class="blog-card-img">
+          <img src="{{ guide.image_url }}" alt="{{ guide.alt_text|default:guide.title }}" title="{{ guide.title }}" loading="lazy" style="width:100%; height:auto; object-fit:cover;">
+        </div>
+        {% endif %}
+        <div class="blog-card-body">
+          {% if guide.category %}<span class="blog-tag">{{ guide.category }}</span>{% endif %}
+          <div class="blog-title">{{ guide.title }}</div>
+          <div class="blog-excerpt">{{ guide.excerpt|truncatechars:140 }}</div>
+          <div class="blog-meta">{{ guide.created_at }}</div>
+        </div>
+      </a>
+      {% empty %}
+      <p style="color:var(--muted); grid-column:1/-1;">No guides published yet.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination" style="margin-top: 40px; display: flex; justify-content: center; gap: 8px;">
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}" style="padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--ink);">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span style="padding: 8px 16px; background: var(--accent); color: white; border-radius: 6px; font-weight: bold;">{{ num }}</span>
+        {% else %}
+        <a href="?page={{ num }}" style="padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--ink);">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" style="padding: 8px 16px; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--ink);">Next</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

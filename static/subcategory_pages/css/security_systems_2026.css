@@ -1,0 +1,109 @@
+/* CSS for Best Smart Home Security System 2026 Page */
+.content-block {
+    margin-bottom: 30px;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.content-block h2 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--ink);
+    margin-top: 25px;
+}
+
+.content-block h2:first-child {
+    margin-top: 0;
+}
+
+.content-block h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--ink);
+    margin-top: 20px;
+}
+
+.content-block p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-bottom: 15px;
+}
+
+/* Sidebar styling overrides from product_list if necessary */
+.filter-cat-row {
+    display: flex;
+    align-items: center;
+    border-radius: 7px;
+    overflow: hidden;
+    transition: background 0.15s;
+}
+.filter-cat-row:hover { background: rgba(0,0,0,0.03); }
+.filter-cat-link {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 8px;
+    font-weight: 600;
+    flex: 1;
+    text-decoration: none;
+    color: var(--ink);
+    background: transparent;
+}
+.filter-cat-link.active { color: var(--accent); background: rgba(255,77,0,0.08); border-radius: 7px; }
+.chevron-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--muted);
+    transition: background 0.15s, transform 0.25s;
+    flex-shrink: 0;
+    margin-right: 4px;
+}
+.chevron-btn:hover { background: rgba(0,0,0,0.05); color: var(--ink); }
+.chevron-btn svg { display: block; transition: transform 0.25s ease; }
+.chevron-btn.collapsed svg { transform: rotate(-90deg); }
+.sub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+.product-page-layout {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+.filter-sidebar {
+    position: sticky;
+    top: 80px;
+}
+@media (max-width: 768px) {
+    .product-page-layout {
+        grid-template-columns: 1fr;
+    }
+    .filter-sidebar {
+        position: static;
+        margin-bottom: 24px;
+    }
+    .filter-header { cursor: pointer; }
+    .filter-toggle-icon { display: block !important; }
+    .filter-body.collapsed { display: none; }
+    .product-page-header { padding: 16px 0 !important; }
+    .product-page-title { font-size: 24px !important; margin-bottom: 4px !important; }
+}
