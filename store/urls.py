@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic.base import RedirectView
 from . import views
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path("guides/", views.subcategory_pages_list, name="guides_list"),
     path("search/", views.search, name="search"),
     path("best-smart-home-security-system/", views.best_smart_home_security_system_2026, name="best_smart_home_security_system_2026"),
+    path("best-smart-home-security-system-2026/", RedirectView.as_view(url='/best-smart-home-security-system/', permanent=True)),
 ]

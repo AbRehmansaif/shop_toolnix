@@ -212,7 +212,7 @@ def subcategory_pages_list(request):
     guides_data = [
         {
             'title': 'Best Smart Home Security System 2026, Compare & Buy',
-            'slug': 'best-smart-home-security-system-2026',
+            'slug': 'best-smart-home-security-system',
             'excerpt': 'Discover the best smart home security systems 2026, trusted expert reviews, all budgets covered. Compare features side by side and shop smarter today.',
             'category': 'Smart Home > Home Security Cameras, Smart Doorbell Products',
             'created_at': 'June 21, 2026',
