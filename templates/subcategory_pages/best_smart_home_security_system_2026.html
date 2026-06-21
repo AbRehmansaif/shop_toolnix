@@ -252,7 +252,10 @@
       </div>
 
       <!-- PRODUCTS SECTION -->
-      <h2 style="margin-top: 40px; margin-bottom: 20px; font-family:var(--font-display);">Top Smart Home Security Cameras & Doorbells</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px;">
+        <h2 style="font-family:var(--font-display); margin: 0;">Top Smart Home Security Cameras & Doorbells</h2>
+        <a href="{% url 'product_list' %}?category={{ current_category }}" style="padding: 10px 20px; background: var(--accent); color: white; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; transition: opacity 0.2s; white-space: nowrap;">View All Products</a>
+      </div>
       <div class="product-grid">
         {% for product in products %}
         {% include "store/_product_card.html" %}
@@ -307,7 +310,10 @@
       </div>
 
       <!-- SECOND PRODUCTS SECTION -->
-      <h2 style="margin-top: 40px; margin-bottom: 20px; font-family:var(--font-display);">Explore More Options</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 40px; margin-bottom: 20px;">
+        <h2 style="font-family:var(--font-display); margin: 0;">Explore More Options</h2>
+        <a href="{% url 'product_list' %}?category={{ current_category }}" style="padding: 10px 20px; background: var(--accent); color: white; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; transition: opacity 0.2s; white-space: nowrap;">View All Products</a>
+      </div>
       <div class="product-grid" style="margin-bottom: 40px;">
         {% for product in products %}
         {% include "store/_product_card.html" %}
