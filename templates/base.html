@@ -10,6 +10,39 @@
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   {% load static %}
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32.png' %}">
+  <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicons/favicon-48.png' %}">
+  <link rel="icon" type="image/png" sizes="64x64" href="{% static 'favicons/favicon-64.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'favicons/apple-touch-icon.png' %}">
+  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'favicons/apple-touch-icon-76.png' %}">
+  <link rel="apple-touch-icon" sizes="120x120" href="{% static 'favicons/apple-touch-icon-120.png' %}">
+  <link rel="apple-touch-icon" sizes="152x152" href="{% static 'favicons/apple-touch-icon-152.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon-180.png' %}">
+  <meta name="msapplication-TileImage" content="{% static 'favicons/ms-icon-144.png' %}">
+  <meta name="msapplication-TileColor" content="#FF4D00">
+  <meta name="theme-color" content="#FF4D00">
+  <!-- PWA Icons -->
+  <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;ShopToolnix&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;{% static 'favicons/pwa-icon-192.png' %}&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;},{&quot;src&quot;:&quot;{% static 'favicons/pwa-icon-512.png' %}&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;}]}&quot;">
+  <!-- Organization Schema — tells Google to show logo in search results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ShopToolnix",
+    "url": "https://shoptoolnix.pro",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://shoptoolnix.pro/static/favicons/android-icon-192.png",
+      "width": 192,
+      "height": 192
+    },
+    "sameAs": [
+      "https://toolnix.pro"
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -411,7 +444,10 @@
 
   <nav class="nav">
     <div class="nav-inner">
-      <a href="{% url 'home' %}" class="nav-logo">🛍️ Shop<span>Toolnix</span></a>
+      <a href="{% url 'home' %}" class="nav-logo" style="display:flex; align-items:center; gap:10px;">
+        <img src="{% static 'favicons/favicon-48.png' %}" alt="ShopToolnix logo" width="32" height="32" style="border-radius:6px; flex-shrink:0;">
+        Shop<span>Toolnix</span>
+      </a>
       <div class="nav-menu" id="navMenu">
         <div class="nav-links">
           <a href="{% url 'home' %}">Home</a>
@@ -455,7 +491,10 @@
       </div>
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="nav-logo">🛍️ Shop<span style="color:var(--accent)">Toolnix</span></div>
+          <div class="nav-logo" style="display:flex; align-items:center; gap:10px;">
+            <img src="{% static 'favicons/favicon-48.png' %}" alt="ShopToolnix logo" width="28" height="28" style="border-radius:5px; flex-shrink:0;">
+            Shop<span style="color:var(--accent)">Toolnix</span>
+          </div>
           <p>Curated affiliate deals from Amazon, eBay, and top brands. We do the research so you don't have to.</p>
         </div>
         <div class="footer-col">
