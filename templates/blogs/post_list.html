@@ -27,8 +27,8 @@
     {% for post in posts %}
     <a href="{{ post.get_absolute_url }}" class="blog-card" style="display: block; text-decoration: none; color: inherit;">
       <div class="blog-card-img">
-        {% if post.featured_image %}
-          <img src="{{ post.featured_image.url }}" alt="{{ post.alt_text|default:post.title }}">
+        {% if post.featured_image and post.featured_image.name %}
+          <img src="{{ post.featured_image.url }}" alt="{{ post.alt_text|default:post.title }}" loading="lazy">
         {% else %}
           <div class="no-img">📝</div>
         {% endif %}
