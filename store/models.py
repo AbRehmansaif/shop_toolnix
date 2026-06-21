@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from ckeditor_uploader.fields import RichTextUploadingField
 
 
 class Category(models.Model):
@@ -57,7 +58,7 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     brand = models.CharField(max_length=100, blank=True)
     slug = models.SlugField(unique=True, blank=True)
-    description = models.TextField()
+    description = RichTextUploadingField()
     short_description = models.CharField(max_length=300, blank=True)
     meta_title = models.CharField(max_length=255, blank=True, help_text="SEO Title. Falls back to title.")
     meta_description = models.TextField(blank=True, help_text="SEO Description. Falls back to short_description or truncated description.")
